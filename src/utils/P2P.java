@@ -1,5 +1,7 @@
 package utils;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class P2P {
 	public P2P(String name,double lattitude, double longitude, int port) {
 		this.processName = name;
 		this.foundNodes = new ArrayList<Node>();
-		this.myNode = new Node(name,lattitude, longitude, port);
+		this.myNode = new Node(name,lattitude, longitude, port,findIPaddr());
 		// TODO: call bootstrap() and block until at least one node is found.
 	}
 
@@ -30,6 +32,12 @@ public class P2P {
 			}
 		}
 		return null;
+	}
+	
+	public synchronized boolean findFirstNode(){
+		
+		
+		return false;
 	}
 
 	public synchronized Node getNode(String name) {
@@ -60,6 +68,18 @@ public class P2P {
 
 		return -1;
 	}
+	
+	private static String findIPaddr(){
+		// TODO: make this failure tolerant
+		InetAddress x = null;
+		try {
+			x = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		return x.getHostAddress();
+	}
+
 
 	/* Setters and Getters */
 
@@ -76,6 +96,7 @@ public class P2P {
 		}
 		return nodesList;
 	}
+	
 	public Node getMyNode(){
 		return myNode;
 	}
