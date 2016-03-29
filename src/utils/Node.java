@@ -1,34 +1,39 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class Node {
+	
 	public String name = null;
 	public String ip = null;
 	public int port = 0;
 	public String address = null;
+	public double lattitude = 0.0;
+	public double longitude = 0.0;
 
-	public Node(HashMap<String, Object> node) {
-		if (node == null) {
-			return;
-		}
+	public Node(String name, double lattitude, double longitude, int port) {
 
-		this.name = (String) node.get("name");
-		this.ip = (String) node.get("ip");
-		this.port = (int) node.get("port");
+		this.lattitude = lattitude;
+		this.longitude = longitude;
+
+		this.name = name;
+		this.ip = findIPaddr();
+		this.port = port;
 		this.address = String.format("/%s:%d", this.ip, this.port);
 	}
-
-	public static List<Node> parseNodeMaps(List<HashMap<String, Object>> nodeMaps) {
-		List<Node> nodes = new ArrayList<Node>(nodeMaps.size());
-		for (HashMap<String, Object> nodeMap : nodeMaps) {
-			nodes.add(new Node(nodeMap));
+	
+	private static String findIPaddr(){
+		// TODO: make this failure tolerant
+		InetAddress x = null;
+		try {
+			x = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
 		}
-		return nodes;
+		return x.getHostAddress();
 	}
-
+	
 	public String toString() {
 		return String.format("%s(%s:%d)", name, ip, port);
 	}
