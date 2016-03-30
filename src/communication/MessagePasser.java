@@ -21,22 +21,21 @@ public class MessagePasser {
 
 	ClockService clockService;
 	P2P p2pNetwork;
-	Node localNode;
+	public Node localNode;
 
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
 
 	HashMap<String, Connection> connection_list;
 
-	public MessagePasser(P2P p2p_network, ClockService newClockService) {
+	public MessagePasser(Node myself, ClockService newClockService) {
 		this.clockService = newClockService;
 		this.connection_list = new HashMap<String, Connection>();
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
 
-
-		this.p2pNetwork = p2p_network;
-		this.localNode = p2p_network.getMyNode();
+		this.localNode = myself;
+		this.p2pNetwork = new P2P(this.localNode);
 
 		if (this.localNode.ip == null || this.localNode.port == 0) {
 			System.out.println("Unknown IP or Port!");
