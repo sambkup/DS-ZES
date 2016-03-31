@@ -1,27 +1,28 @@
 package utils;
 
-public class Node {
+import java.io.Serializable;
+
+public class Node implements Serializable {
 	
-	public String name = null;
+	private static final long serialVersionUID = -6754243543644721809L;
+	
 	public String ip = null;
 	public int port = 0;
 	public String address = null;
-	public double lattitude = 0.0;
-	public double longitude = 0.0;
+	NodePatrolArea myPatrolArea;
+	P2PRegion p2pPatrolArea;
 
-	public Node(String name, double lattitude, double longitude, int port, String ip) {
+	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, int port, String ip) {
 
-		this.lattitude = lattitude;
-		this.longitude = longitude;
-
-		this.name = name;
-		this.ip = ip;
+		this.myPatrolArea = myPatrolArea;
+		this.p2pPatrolArea = p2pPatrolArea;
 		this.port = port;
+		this.ip = ip;
 		this.address = String.format("/%s:%d", this.ip, this.port);
 	}
 	
 	
 	public String toString() {
-		return String.format("%s(%s:%d)", name, ip, port);
+		return String.format("(%s:%d)", ip, port);
 	}
 }

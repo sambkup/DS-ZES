@@ -83,46 +83,39 @@ public class P2PNetwork {
 				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
 				s = new Socket();
 				s.connect(endpoint, 100);
+				System.out.println(testIP + " - Found first node");
+				addFoundNode(testIP);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				//System.out.println(testIP + " - Closed");
+				System.out.println(testIP + " - Closed");
 				continue;
 			}
 			if (s != null){
 				try {
 					s.close();
+					return true;
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			System.out.println(testIP + " - Found first node");
-			addFoundNode(testIP);
-			return true;
 		}
 		return false;
 	}
 
 	private void addFoundNode(String IP){
-		String name = "Node"+this.nodecount++;
+		String name = "("+IP+":4001)";
 		// TODO: Request details from this node - latt, long
-
-		double lattitude = 0.0;
-		double longitude = 0.0;
-		int port = this.localNode.port;
-		Node newNode = new Node(name,lattitude, longitude, port,IP);
-		synchronized (foundNodes){
-			foundNodes.add(newNode);
-		}
-		
+		Message message = new Message(name,"getParam",this.localNode);
+		this.send(message);		
 	}
 	
 	
 	public Connection open_connection(Node node) {
 
-		if (node == null || node.ip == null || node.port == 0 || node.name == null) {
+		if (node == null || node.ip == null || node.port == 0) {
 			return null;
 		}
 		Socket s = null;
@@ -134,10 +127,10 @@ public class P2PNetwork {
 			Connection c = new Connection(s, this);
 			// c.print();
 			synchronized (connection_list) {
-				connection_list.put(node.name, c);
+				connection_list.put(node.toString(), c);
 			}
-			Message marco = new Message(node.name, "marco", "marco");
-			marco.src = this.localNode.name;
+			Message marco = new Message(node.toString(), "marco", "marco");
+			marco.src = this.localNode.toString();
 			c.send_marco(marco);
 
 			System.out.println("Sent Marco to node: " + node.toString());
@@ -184,7 +177,7 @@ public class P2PNetwork {
 			connection_to_use.seqNum++;
 			message.set_seqNum(connection_to_use.seqNum);
 		}
-		message.set_source(this.localNode.name);
+		message.set_source(this.localNode.toString());
 
 		send_tcp(message, connection_to_use);
 
@@ -285,7 +278,7 @@ public class P2PNetwork {
 
 	public void add_connection(String name, Connection connection) {
 		Connection existing = connection_list.get(name);
-		if (existing != null && existing.status != ConnectionStatus.ready && !name.equals(this.localNode.name)) {
+		if (existing != null && existing.status != ConnectionStatus.ready && !name.equals(this.localNode.toString())) {
 			// compare
 			Connection winner = compare_connections(existing, connection);
 			if (winner == existing) {
@@ -304,7 +297,7 @@ public class P2PNetwork {
 		}
 
 		Message polo = new Message(name, "polo", "polo");
-		polo.src = this.localNode.name;
+		polo.src = this.localNode.toString();
 		connection.send_polo(polo);
 
 		connection.set_status(ConnectionStatus.ready);

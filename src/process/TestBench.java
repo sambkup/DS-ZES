@@ -1,13 +1,25 @@
 package process;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
+import communication.Message;
 import communication.P2PNetwork;
+import communication.TimeStampedMessage;
 import services.ClockService;
 import utils.Node;
+import utils.NodePatrolArea;
+import utils.P2PRegion;
 
 public class TestBench {
 
@@ -39,35 +51,41 @@ public class TestBench {
 	
 	//private static String name;
 
-	private static String name;
+	protected static final String receive_block = new String();
 	private static int port;
-	private static P2PNetwork messagePasser;
+	private static P2PNetwork p2p;
 	private static ClockService clock;
 	
 	public static void main(String[] args) {
 		// --------------------------------
 		// initialize - get necessary parameter inputs
 
-		name = "sammy";
 		port = 4001;
+		double[] range = {80.9000,-90.000,80.9000,-90.000};
+		P2PRegion region = new P2PRegion(range);
+		NodePatrolArea initial_patrol_area = new NodePatrolArea(range);
+		Node myself = new Node(initial_patrol_area,region,port,findMyIPaddr());
 
 		// --------------------------------
 		// construct the required objects
 
 		clock = ClockService.clockServiceFactory("logical");
-		Node myself = new Node(name,80.9000,-90.000,port, findMyIPaddr());
 
-		messagePasser = new P2PNetwork(myself, clock);
+		p2p = new P2PNetwork(myself, clock);
 		
-		System.out.println(messagePasser.localNode.toString());
+		System.out.println(p2p.localNode.toString());
 		
+		
+		Message message = new Message(p2p.localNode.toString(),"generic","blah");
+		p2p.send(message);
 		
 		// --------------------------------
 		// Execute something here
 		
-		
+		message_prompt();
+		run_receiver(p2p);
 		//prompt();
-		System.exit(0);
+		//System.exit(0);
 		
 	}
 	
@@ -104,4 +122,83 @@ public class TestBench {
 
 		receiver_thread.start();
 	}
+	
+
+	private static void run_receiver(P2PNetwork msg_passer) {
+		Thread receiver_thread = new Thread() {
+			public void run() {
+				while (true) {
+					synchronized (receive_block) {
+						try {
+							receive_block.wait();
+						} catch (InterruptedException e) {
+							System.out.println("failed to wait");
+							e.printStackTrace();
+						}
+						TimeStampedMessage rcved = (TimeStampedMessage) msg_passer.receive();
+						if (rcved != null) {
+							rcved.print();
+						}
+					}
+				}
+			}
+		};
+
+		receiver_thread.start();
+	}
+
+	private static void message_prompt() {
+		Object[] options = { "Send","Receive"};
+
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(10, 10, 10, 10);
+
+		JTextField xField = new JTextField(15);
+		JTextField yField = new JTextField(15);
+		JTextField zField = new JTextField(15);
+		JTextField groupField = new JTextField(15);
+
+		JPanel myPanel = new JPanel();
+
+		myPanel.setLayout(new GridBagLayout());
+		
+		String[] rowMessages = {"Fill in the Message:", "Message destination:", "Message Payload:", "Message Kind:"};
+		JComponent[] components = {xField, yField, zField, groupField};
+		int rows = rowMessages.length;
+		for (int row=0; row<rows; row++) {
+			constraints.gridx = 0;
+			constraints.gridy = row;
+			myPanel.add(new JLabel(rowMessages[row]), constraints);
+			
+			if (row == 0) continue;
+			
+			constraints.gridx = 1;
+			constraints.gridy = row;
+			myPanel.add(components[row-1], constraints);
+		}
+
+		myPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Message"));
+
+		int result = JOptionPane.showOptionDialog(null, myPanel, "Process: " + p2p.localNode.toString(), JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+		String dest = xField.getText();
+		String payload = yField.getText();
+		String kind = zField.getText();
+		
+		if (result == -1) {
+			System.exit(0);
+		} else if (options[result].equals("Send")) {
+			Message message = new Message(dest, kind, payload);
+			p2p.send(message);
+
+		}  else if (options[result].equals("Receive")) {
+			synchronized (receive_block) {
+				receive_block.notify();
+			}
+		} 
+
+	}
+
+	
 }
