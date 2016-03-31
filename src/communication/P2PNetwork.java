@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -14,34 +15,46 @@ import java.util.HashMap;
 import java.util.List;
 import communication.Connection.ConnectionStatus;
 import services.ClockService;
-import utils.P2P;
 import utils.Node;
 
-public class MessagePasser {
+public class P2PNetwork {
 
 	ClockService clockService;
-	P2P p2pNetwork;
 	public Node localNode;
 
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
+	
+	List<Node> foundNodes;
+	int nodecount = 0;
+	List<Node> neighborNodes;
+	
 
 	HashMap<String, Connection> connection_list;
 
-	public MessagePasser(Node myself, ClockService newClockService) {
+	public P2PNetwork(Node myself, ClockService newClockService) {
+		/* Initiate the fields */
 		this.clockService = newClockService;
 		this.connection_list = new HashMap<String, Connection>();
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
-
+		this.foundNodes = new ArrayList<Node>();
+		
 		this.localNode = myself;
-		this.p2pNetwork = new P2P(this.localNode);
 
 		if (this.localNode.ip == null || this.localNode.port == 0) {
 			System.out.println("Unknown IP or Port!");
+			// TODO: throw an exception - maybe IncorrectPortOrIP
 			return;
 		}
+		
+		/* bootstrap */
+		System.out.println("Starting bootstrapping...");
+		findFirstNode();
 
+		
+		
+		
 		// run server
 		Thread server = new Thread() {
 			public void run() {
@@ -51,6 +64,62 @@ public class MessagePasser {
 		server.start();
 	}
 
+
+	public boolean findFirstNode(){
+		String myIP = this.localNode.ip;
+		String delims = "[.]";
+		String[] chunks = myIP.split(delims);
+
+		int maxIP = 256;
+		String testIP;
+		for (int i = 1; i<maxIP; i++){
+			if (Integer.toString(i).equals(chunks[3])){
+				continue;
+			}
+
+			testIP = chunks[0]+"."+chunks[1]+"."+chunks[2]+"."+i;
+			Socket s = null;
+			try {
+				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
+				s = new Socket();
+				s.connect(endpoint, 100);
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				//System.out.println(testIP + " - Closed");
+				continue;
+			}
+			if (s != null){
+				try {
+					s.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			System.out.println(testIP + " - Found first node");
+			addFoundNode(testIP);
+			return true;
+		}
+		return false;
+	}
+
+	private void addFoundNode(String IP){
+		String name = "Node"+this.nodecount++;
+		// TODO: Request details from this node - latt, long
+
+		double lattitude = 0.0;
+		double longitude = 0.0;
+		int port = this.localNode.port;
+		Node newNode = new Node(name,lattitude, longitude, port,IP);
+		synchronized (foundNodes){
+			foundNodes.add(newNode);
+		}
+		
+	}
+	
+	
 	public Connection open_connection(Node node) {
 
 		if (node == null || node.ip == null || node.port == 0 || node.name == null) {
@@ -98,8 +167,9 @@ public class MessagePasser {
 				return connection_list.get(name);
 			}
 		}
-		// else, open a new TCP socket and turn it into a connection
-		return open_connection(this.p2pNetwork.getNode(name));
+//		// else, open a new TCP socket and turn it into a connection
+//		return open_connection(this.p2pNetwork.getNode(name));
+		return open_connection(this.localNode);
 	}
 
 	public synchronized void send(Message message) {
@@ -261,10 +331,10 @@ class Connection extends Thread {
 	volatile int seqNum = -1;
 	ConnectionStatus status = ConnectionStatus.closed;
 	Socket clientSocket;
-	MessagePasser msg_passer;
+	P2PNetwork msg_passer;
 	List<Message> message_queue = new ArrayList<Message>();
 
-	public Connection(Socket aClientSocket, MessagePasser msg_passer) {
+	public Connection(Socket aClientSocket, P2PNetwork msg_passer) {
 		this.msg_passer = msg_passer;
 		try {
 			clientSocket = aClientSocket;

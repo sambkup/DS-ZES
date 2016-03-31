@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JOptionPane;
 
-import communication.MessagePasser;
+import communication.P2PNetwork;
 import services.ClockService;
 import utils.Node;
 
@@ -41,7 +41,7 @@ public class TestBench {
 
 	private static String name;
 	private static int port;
-	private static MessagePasser messagePasser;
+	private static P2PNetwork messagePasser;
 	private static ClockService clock;
 	
 	public static void main(String[] args) {
@@ -50,8 +50,6 @@ public class TestBench {
 
 		name = "sammy";
 		port = 4001;
-		// config_file_address =
-		// "http://www.andrew.cmu.edu/user/skupfer/config.txt";
 
 		// --------------------------------
 		// construct the required objects
@@ -59,7 +57,7 @@ public class TestBench {
 		clock = ClockService.clockServiceFactory("logical");
 		Node myself = new Node(name,80.9000,-90.000,port, findMyIPaddr());
 
-		messagePasser = new MessagePasser(myself, clock);
+		messagePasser = new P2PNetwork(myself, clock);
 		
 		System.out.println(messagePasser.localNode.toString());
 		
