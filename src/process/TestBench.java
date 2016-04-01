@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 
 import communication.Message;
 import communication.P2PNetwork;
-import communication.TimeStampedMessage;
 import services.ClockService;
 import utils.Node;
 import utils.NodePatrolArea;
@@ -45,6 +44,7 @@ public class TestBench {
 	 * - Just need to find one, and that will help you get to the next one
 	 * - For demo, serially check every port in localhost
 	 * 
+	 * - change code to use ports so I can start testing again
 	 * 
 	 */
 	
@@ -55,6 +55,7 @@ public class TestBench {
 	private static int port;
 	private static P2PNetwork p2p;
 	private static ClockService clock;
+	static Node myself;
 	
 	public static void main(String[] args) {
 		// --------------------------------
@@ -64,7 +65,7 @@ public class TestBench {
 		double[] range = {80.9000,-90.000,80.9000,-90.000};
 		P2PRegion region = new P2PRegion(range);
 		NodePatrolArea initial_patrol_area = new NodePatrolArea(range);
-		Node myself = new Node(initial_patrol_area,region,port,findMyIPaddr());
+		myself = new Node(initial_patrol_area,region,port,findMyIPaddr());
 
 		// --------------------------------
 		// construct the required objects
@@ -76,7 +77,7 @@ public class TestBench {
 		System.out.println(p2p.localNode.toString());
 		
 		
-		Message message = new Message(p2p.localNode.toString(),"generic","blah");
+		Message message = new Message(p2p.localNode.ip,p2p.localNode.port ,"generic",myself);
 		p2p.send(message);
 		
 		// --------------------------------
@@ -135,7 +136,7 @@ public class TestBench {
 							System.out.println("failed to wait");
 							e.printStackTrace();
 						}
-						TimeStampedMessage rcved = (TimeStampedMessage) msg_passer.receive();
+						Message rcved = (Message) msg_passer.receive();
 						if (rcved != null) {
 							rcved.print();
 						}
@@ -155,7 +156,6 @@ public class TestBench {
 		constraints.insets = new Insets(10, 10, 10, 10);
 
 		JTextField xField = new JTextField(15);
-		JTextField yField = new JTextField(15);
 		JTextField zField = new JTextField(15);
 		JTextField groupField = new JTextField(15);
 
@@ -163,8 +163,8 @@ public class TestBench {
 
 		myPanel.setLayout(new GridBagLayout());
 		
-		String[] rowMessages = {"Fill in the Message:", "Message destination:", "Message Payload:", "Message Kind:"};
-		JComponent[] components = {xField, yField, zField, groupField};
+		String[] rowMessages = {"Fill in the Message:", "Message destination:", "Message Kind:"};
+		JComponent[] components = {xField, zField, groupField};
 		int rows = rowMessages.length;
 		for (int row=0; row<rows; row++) {
 			constraints.gridx = 0;
@@ -183,13 +183,12 @@ public class TestBench {
 		int result = JOptionPane.showOptionDialog(null, myPanel, "Process: " + p2p.localNode.toString(), JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		String dest = xField.getText();
-		String payload = yField.getText();
 		String kind = zField.getText();
 		
 		if (result == -1) {
 			System.exit(0);
 		} else if (options[result].equals("Send")) {
-			Message message = new Message(dest, kind, payload);
+			Message message = new Message(dest, 4001, kind, myself);
 			p2p.send(message);
 
 		}  else if (options[result].equals("Receive")) {

@@ -29,6 +29,8 @@ public class P2PNetwork {
 	int nodecount = 0;
 	List<Node> neighborNodes;
 	
+	int port = 4001;
+	
 
 	HashMap<String, Connection> connection_list;
 
@@ -106,9 +108,9 @@ public class P2PNetwork {
 	}
 
 	private void addFoundNode(String IP){
-		String name = "("+IP+":4001)";
+//		String name = "("+IP+":"+this.port+")";
 		// TODO: Request details from this node - latt, long
-		Message message = new Message(name,"getParam",this.localNode);
+		Message message = new Message(IP, this.port,"getParam",this.localNode);
 		this.send(message);		
 	}
 	
@@ -129,7 +131,7 @@ public class P2PNetwork {
 			synchronized (connection_list) {
 				connection_list.put(node.toString(), c);
 			}
-			Message marco = new Message(node.toString(), "marco", "marco");
+			Message marco = new Message(node.ip, node.port, "marco", localNode);
 			marco.src = this.localNode.toString();
 			c.send_marco(marco);
 
@@ -152,21 +154,21 @@ public class P2PNetwork {
 		return null;
 	}
 
-	Connection get_connection(String name) {
+	Connection get_connection(Node node) {
 		synchronized (connection_list) {
 			// lookup open connection in hashmap
-			if (connection_list.containsKey(name)) {
+			if (connection_list.containsKey(node.toString())) {
 				// if there is one, return it
-				return connection_list.get(name);
+				return connection_list.get(node.toString());
 			}
 		}
 //		// else, open a new TCP socket and turn it into a connection
 //		return open_connection(this.p2pNetwork.getNode(name));
-		return open_connection(this.localNode);
+		return open_connection(node);
 	}
 
 	public synchronized void send(Message message) {
-		Connection connection_to_use = get_connection(message.dest);
+		Connection connection_to_use = get_connection(message.getNode());
 		if (connection_to_use == null) {
 			System.out.println("Failed to find or open connection");
 			return;
@@ -214,7 +216,7 @@ public class P2PNetwork {
 			c.set_status(ConnectionStatus.ready);
 			return;
 		} else if (message.kind.equals("marco")) {
-			add_connection(message.src, c);
+			add_connection(message.getNode(), c);
 			return;
 		}  
 
@@ -276,9 +278,9 @@ public class P2PNetwork {
 		return localValue > remoteValue ? existing : remote;
 	}
 
-	public void add_connection(String name, Connection connection) {
-		Connection existing = connection_list.get(name);
-		if (existing != null && existing.status != ConnectionStatus.ready && !name.equals(this.localNode.toString())) {
+	public void add_connection(Node node, Connection connection) {
+		Connection existing = connection_list.get(node.getName());
+		if (existing != null && existing.status != ConnectionStatus.ready && !node.getName().equals(this.localNode.toString())) {
 			// compare
 			Connection winner = compare_connections(existing, connection);
 			if (winner == existing) {
@@ -293,10 +295,10 @@ public class P2PNetwork {
 		}
 
 		synchronized (connection_list) {
-			connection_list.put(name, connection);
+			connection_list.put(node.getName(), connection);
 		}
 
-		Message polo = new Message(name, "polo", "polo");
+		Message polo = new Message(node.ip, node.port, "polo", localNode);
 		polo.src = this.localNode.toString();
 		connection.send_polo(polo);
 

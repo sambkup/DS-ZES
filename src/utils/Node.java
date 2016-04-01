@@ -21,6 +21,9 @@ public class Node implements Serializable {
 		this.address = String.format("/%s:%d", this.ip, this.port);
 	}
 	
+	public String getName(){
+		return "("+this.ip+":"+this.port+")";
+	}
 	
 	public String toString() {
 		return String.format("(%s:%d)", ip, port);
