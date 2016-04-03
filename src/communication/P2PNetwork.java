@@ -59,7 +59,7 @@ public class P2PNetwork {
 		int startport = 4000;
 		int endport = 4200;
 		
-		// TODO: randomize the start point, so the earlier ports aren't overused
+		// TODO: randomize the start point, so the earlier ports aren't overwhelmed
 		for (int port = startport; port <= endport; port++){
 			// Ignore myself
 			if (port == localport){
@@ -79,7 +79,7 @@ public class P2PNetwork {
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				// socket did not successfully open
+//				socket did not successfully open
 //				System.out.println(testIP+":"+port + " - Closed");
 			}
 		}
@@ -139,8 +139,7 @@ public class P2PNetwork {
 
 	public synchronized void receive_message(Message message, Connection c) {
 		if (message.kind.equals("getParam")) {
-			// add this node to 'found nodes' and respond with myNode
-			System.out.println("A new node contacted me");
+			System.out.println("Recevied \"getParam\"");
 			Node newNode = message.getNode();
 			this.foundNodes.add(newNode);
 			Message msg = new Message(newNode.ip,newNode.port,"parameters", this.localNode);
@@ -148,14 +147,14 @@ public class P2PNetwork {
 			return;
 		}  else if (message.kind.equals("parameters")){
 			// add this node's parameters to myself
-			System.out.println("I received a node's parameters");
+			System.out.println("Recevied \"parameters\"");
 			Node newNode = message.getNode();
 			this.foundNodes.add(newNode);
+			// TODO: take some action to place myself
 			return;
 		}
 		
-		
-
+		// the receive buffer from the Homeworks
 		synchronized (receive_queue) {
 			receive_queue.add(message);
 		}

@@ -51,7 +51,7 @@ public class TestBench {
 		// Ports can be in the range 4000 - 4200 (can be increased if needed)
 		port = 4011;
 		
-		/* CMU is not perfectly alightned north/south
+		/* CMU is not perfectly aligned north/south
 		 * Southwest corner: 40.441713 | Longitude: -79.947789
 		 * Southeast corner: 40.440309 | Longitude: -79.941298 (roughly)
 		 * Northwest corner: 40.444963 | Longitude: -79.946405 (roughly)
@@ -61,11 +61,9 @@ public class TestBench {
 		 * Position 2: 40.442546 | Longitude: -79.941759
 		 */
 		
-		
-		
 		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
 		double[] location = {40.443052,-79.944806};
-//		double[] location = {40.442546,-79.941759};
+//		double[] location = {40.442546,-79.941759}; // a second spot on campus
 		P2PRegion region = new P2PRegion(range);
 		NodePatrolArea initial_patrol_area = new NodePatrolArea(range);
 		NodeLocation node_loc = new NodeLocation(location);
@@ -160,8 +158,9 @@ public class TestBench {
 		if (result == -1) {
 			System.exit(0);
 		} else if (options[result].equals("Send")) {
+			@SuppressWarnings("unused")
 			Message message = new Message(dest, 4001, kind, myself);
-			p2p.send(message);
+			//p2p.send(message);
 
 		}  else if (options[result].equals("Print Nodes")) {
 			p2p.printFoundNodes();
