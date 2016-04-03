@@ -10,7 +10,7 @@ public class Node implements Serializable {
 	public int port = 0;
 	public String address = null;
 	NodePatrolArea myPatrolArea;
-	P2PRegion p2pPatrolArea;
+	public P2PRegion p2pPatrolArea;
 
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, int port, String ip) {
 

@@ -1,6 +1,10 @@
 package utils;
 
-public class NodePatrolArea {
+import java.io.Serializable;
+
+public class NodePatrolArea implements Serializable{
+
+	private static final long serialVersionUID = -7166993872659928457L;
 	private double[] range = new double[4];
 	
 	public NodePatrolArea(double min_lat, double max_lat, double min_long, double max_long){

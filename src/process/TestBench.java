@@ -15,7 +15,6 @@ import javax.swing.JTextField;
 
 import communication.Message;
 import communication.P2PNetwork;
-import services.ClockService;
 import utils.Node;
 import utils.NodePatrolArea;
 import utils.P2PRegion;
@@ -54,45 +53,38 @@ public class TestBench {
 	protected static final String receive_block = new String();
 	private static int port;
 	private static P2PNetwork p2p;
-	private static ClockService clock;
 	static Node myself;
 	
 	public static void main(String[] args) {
 		// --------------------------------
 		// initialize - get necessary parameter inputs
 
-		port = 4001;
+		// Ports can be in the range 4000 - 4200 (can be increased if needed)
+		port = 4011;
+		
 		double[] range = {80.9000,-90.000,80.9000,-90.000};
 		P2PRegion region = new P2PRegion(range);
 		NodePatrolArea initial_patrol_area = new NodePatrolArea(range);
-		myself = new Node(initial_patrol_area,region,port,findMyIPaddr());
+//		String IP = findMyIPaddr();
+//		String IP = "10.0.0.183";
+		String IP = "127.0.0.1";
+		myself = new Node(initial_patrol_area,region,port,IP);
 
 		// --------------------------------
 		// construct the required objects
 
-		clock = ClockService.clockServiceFactory("logical");
-
-		p2p = new P2PNetwork(myself, clock);
-		
-		System.out.println(p2p.localNode.toString());
-		
-		
-		Message message = new Message(p2p.localNode.ip,p2p.localNode.port ,"generic",myself);
-		p2p.send(message);
-		
+		p2p = new P2PNetwork(myself);
+				
 		// --------------------------------
 		// Execute something here
-		
-		message_prompt();
-		run_receiver(p2p);
-		//prompt();
-		//System.exit(0);
-		
+			
+		while (true){
+			message_prompt();
+		}		
 	}
 	
-	
-	
 
+	@SuppressWarnings("unused")
 	private static String findMyIPaddr(){
 		// TODO: make this failure tolerant
 		InetAddress x = null;
@@ -124,32 +116,8 @@ public class TestBench {
 		receiver_thread.start();
 	}
 	
-
-	private static void run_receiver(P2PNetwork msg_passer) {
-		Thread receiver_thread = new Thread() {
-			public void run() {
-				while (true) {
-					synchronized (receive_block) {
-						try {
-							receive_block.wait();
-						} catch (InterruptedException e) {
-							System.out.println("failed to wait");
-							e.printStackTrace();
-						}
-						Message rcved = (Message) msg_passer.receive();
-						if (rcved != null) {
-							rcved.print();
-						}
-					}
-				}
-			}
-		};
-
-		receiver_thread.start();
-	}
-
 	private static void message_prompt() {
-		Object[] options = { "Send","Receive"};
+		Object[] options = { "Send","Print Nodes"};
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.anchor = GridBagConstraints.WEST;
@@ -191,10 +159,8 @@ public class TestBench {
 			Message message = new Message(dest, 4001, kind, myself);
 			p2p.send(message);
 
-		}  else if (options[result].equals("Receive")) {
-			synchronized (receive_block) {
-				receive_block.notify();
-			}
+		}  else if (options[result].equals("Print Nodes")) {
+			p2p.printFoundNodes();
 		} 
 
 	}

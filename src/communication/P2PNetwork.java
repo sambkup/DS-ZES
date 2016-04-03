@@ -6,38 +6,25 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import communication.Connection.ConnectionStatus;
-import services.ClockService;
 import utils.Node;
 
 public class P2PNetwork {
 
-	ClockService clockService;
 	public Node localNode;
 
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
 	
 	List<Node> foundNodes;
-	int nodecount = 0;
 	List<Node> neighborNodes;
-	
-	int port = 4001;
-	
 
-	HashMap<String, Connection> connection_list;
-
-	public P2PNetwork(Node myself, ClockService newClockService) {
+	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
-		this.clockService = newClockService;
-		this.connection_list = new HashMap<String, Connection>();
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
 		this.foundNodes = new ArrayList<Node>();
@@ -46,16 +33,9 @@ public class P2PNetwork {
 
 		if (this.localNode.ip == null || this.localNode.port == 0) {
 			System.out.println("Unknown IP or Port!");
-			// TODO: throw an exception - maybe IncorrectPortOrIP
+			// TODO: throw an exception - maybe IncorrectPortIP
 			return;
 		}
-		
-		/* bootstrap */
-		System.out.println("Starting bootstrapping...");
-		findFirstNode();
-
-		
-		
 		
 		// run server
 		Thread server = new Thread() {
@@ -64,79 +44,64 @@ public class P2PNetwork {
 			}
 		};
 		server.start();
+		
+		/* bootstrap */
+		System.out.println("Starting bootstrapping...");
+		if (!findFirstNodeByPort()){
+			System.out.println("I am the first node");
+		}
+		
 	}
 
-
-	public boolean findFirstNode(){
-		String myIP = this.localNode.ip;
-		String delims = "[.]";
-		String[] chunks = myIP.split(delims);
-
-		int maxIP = 256;
-		String testIP;
-		for (int i = 1; i<maxIP; i++){
-			if (Integer.toString(i).equals(chunks[3])){
+	public boolean findFirstNodeByPort(){
+		String testIP = this.localNode.ip;
+		int localport = this.localNode.port;
+		int startport = 4000;
+		int endport = 4200;
+		
+		// TODO: randomize the start point, so the earlier ports aren't overused
+		for (int port = startport; port <= endport; port++){
+			// Ignore myself
+			if (port == localport){
 				continue;
 			}
-
-			testIP = chunks[0]+"."+chunks[1]+"."+chunks[2]+"."+i;
+			
 			Socket s = null;
 			try {
-				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
-				s = new Socket();
-				s.connect(endpoint, 100);
-				System.out.println(testIP + " - Found first node");
-				addFoundNode(testIP);
+				s = new Socket(testIP, port);
+				
+				// if a socket successfully opened
+				s.close();
+				System.out.println(testIP+":"+port + " - Found first node");	
+				Message message = new Message(testIP, port,"getParam",this.localNode);
+				send(message);	
+				return true;
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				System.out.println(testIP + " - Closed");
-				continue;
-			}
-			if (s != null){
-				try {
-					s.close();
-					return true;
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				// socket did not successfully open
+//				System.out.println(testIP+":"+port + " - Closed");
 			}
 		}
 		return false;
 	}
 
-	private void addFoundNode(String IP){
-//		String name = "("+IP+":"+this.port+")";
-		// TODO: Request details from this node - latt, long
-		Message message = new Message(IP, this.port,"getParam",this.localNode);
-		this.send(message);		
-	}
-	
-	
-	public Connection open_connection(Node node) {
+	public void send(Message message) {
+		String ip = message.destIP;
+		int port = message.destPort;
+		
+		System.out.println("Sending message to "+ip+":"+port);
 
-		if (node == null || node.ip == null || node.port == 0) {
-			return null;
-		}
 		Socket s = null;
+		Connection connection_to_use = null;
 
 		try {
-			s = new Socket(node.ip, node.port);
+			s = new Socket(ip, port);
 			s.setKeepAlive(true);
 
-			Connection c = new Connection(s, this);
-			// c.print();
-			synchronized (connection_list) {
-				connection_list.put(node.toString(), c);
-			}
-			Message marco = new Message(node.ip, node.port, "marco", localNode);
-			marco.src = this.localNode.toString();
-			c.send_marco(marco);
-
-			System.out.println("Sent Marco to node: " + node.toString());
-			return c;
+			connection_to_use = new Connection(s, this);
+			System.out.println("Connection created");
+			
 		} catch (UnknownHostException e) {
 			System.out.println("Client Socket error:" + e.getMessage());
 		} catch (EOFException e) {
@@ -144,53 +109,15 @@ public class P2PNetwork {
 		} catch (IOException e) {
 			System.out.println("Client readline error:" + e.getMessage());
 		}
-
-		if (s != null)
-			try {
-				s.close();
-			} catch (IOException e) {
-				System.out.println("close error:" + e.getMessage());
-			}
-		return null;
-	}
-
-	Connection get_connection(Node node) {
-		synchronized (connection_list) {
-			// lookup open connection in hashmap
-			if (connection_list.containsKey(node.toString())) {
-				// if there is one, return it
-				return connection_list.get(node.toString());
-			}
-		}
-//		// else, open a new TCP socket and turn it into a connection
-//		return open_connection(this.p2pNetwork.getNode(name));
-		return open_connection(node);
-	}
-
-	public synchronized void send(Message message) {
-		Connection connection_to_use = get_connection(message.getNode());
+		
 		if (connection_to_use == null) {
 			System.out.println("Failed to find or open connection");
 			return;
 		}
 
-		// send message via TCP:
-		synchronized (connection_to_use) {
-			connection_to_use.seqNum++;
-			message.set_seqNum(connection_to_use.seqNum);
-		}
-		message.set_source(this.localNode.toString());
-
-		send_tcp(message, connection_to_use);
-
-	}
-
-	private void send_tcp(Message message, Connection connection_to_use) {
-		if (connection_to_use.status == ConnectionStatus.ready) {
-			connection_to_use.write_object(message);
-		} else {
-			connection_to_use.enqueue(message);
-		}
+		System.out.println("Sending message");
+		connection_to_use.write_object(message);
+		connection_to_use.close();
 
 	}
 
@@ -211,14 +138,23 @@ public class P2PNetwork {
 	}
 
 	public synchronized void receive_message(Message message, Connection c) {
-		//	System.out.println("Got " + message.kind + " from " + message.src);
-		if (message.kind.equals("polo")) {
-			c.set_status(ConnectionStatus.ready);
+		if (message.kind.equals("getParam")) {
+			// add this node to 'found nodes' and respond with myNode
+			System.out.println("A new node contacted me");
+			Node newNode = message.getNode();
+			this.foundNodes.add(newNode);
+			Message msg = new Message(newNode.ip,newNode.port,"parameters", this.localNode);
+			this.send(msg);
 			return;
-		} else if (message.kind.equals("marco")) {
-			add_connection(message.getNode(), c);
+		}  else if (message.kind.equals("parameters")){
+			// add this node's parameters to myself
+			System.out.println("I received a node's parameters");
+			Node newNode = message.getNode();
+			this.foundNodes.add(newNode);
 			return;
-		}  
+		}
+		
+		
 
 		synchronized (receive_queue) {
 			receive_queue.add(message);
@@ -241,8 +177,7 @@ public class P2PNetwork {
 			listenSocket = new ServerSocket(this.localNode.port);
 
 			while (true) {
-				Socket clientSocket = listenSocket.accept();
-
+				Socket clientSocket = listenSocket.accept();				
 				new Connection(clientSocket, this);
 				System.out.println("Server received a new connection: # " + counter);
 				counter++;
@@ -252,6 +187,7 @@ public class P2PNetwork {
 		} finally {
 			try {
 				if (listenSocket != null)
+					System.out.println("Closing socket");
 					listenSocket.close();
 			} catch (IOException e) {
 				System.out.println("Failed to close server.");
@@ -260,77 +196,29 @@ public class P2PNetwork {
 
 	}
 
-	private Connection compare_connections(Connection existing, Connection remote) {
-		int remotePort = remote.clientSocket.getPort();
-		String remoteAddressStr = remote.clientSocket.getInetAddress().toString();
-		remoteAddressStr = remoteAddressStr.replace(".", "");
-		remoteAddressStr = remoteAddressStr.replace("/", "");
-		String remoteValueStr = String.format("%d%s", remotePort, remoteAddressStr);
-		long remoteValue = Long.parseLong(remoteValueStr);
-
-		int localPort = existing.clientSocket.getLocalPort();
-		String localAddressStr = existing.clientSocket.getLocalAddress().toString();
-		localAddressStr = localAddressStr.replace(".", "");
-		localAddressStr = localAddressStr.replace("/", "");
-		String localValueStr = String.format("%d%s", localPort, localAddressStr);
-		long localValue = Long.parseLong(localValueStr);
-
-		return localValue > remoteValue ? existing : remote;
-	}
-
-	public void add_connection(Node node, Connection connection) {
-		Connection existing = connection_list.get(node.getName());
-		if (existing != null && existing.status != ConnectionStatus.ready && !node.getName().equals(this.localNode.toString())) {
-			// compare
-			Connection winner = compare_connections(existing, connection);
-			if (winner == existing) {
-				connection.close();
-				return;
-			} else {
-				if (!existing.message_queue.isEmpty()) {
-					connection.message_queue.addAll(existing.message_queue);
-				}
-				existing.close();
-			}
+	public void printFoundNodes(){
+		System.out.println("Printing Found Nodes----------");
+		int numFoundNodes = this.foundNodes.size();
+		for (int i = 0; i<numFoundNodes; i++){
+			System.out.println(i+": "+this.foundNodes.get(i).toString());
 		}
-
-		synchronized (connection_list) {
-			connection_list.put(node.getName(), connection);
-		}
-
-		Message polo = new Message(node.ip, node.port, "polo", localNode);
-		polo.src = this.localNode.toString();
-		connection.send_polo(polo);
-
-		connection.set_status(ConnectionStatus.ready);
+		System.out.println("------------------------------");
 	}
-
-	public void remove_connection(Connection connection) {
-		synchronized (connection_list) {
-			connection_list.remove(connection.clientSocket.getRemoteSocketAddress().toString());
-		}
-	}
-
+	
 }
 
 class Connection extends Thread {
-	public enum ConnectionStatus {
-		none, open, ready, closed
-	}
 
 	DataInputStream in;
 	DataOutputStream out;
 	ObjectOutputStream outObj;
 	ObjectInputStream inObj;
 
-	volatile int seqNum = -1;
-	ConnectionStatus status = ConnectionStatus.closed;
 	Socket clientSocket;
-	P2PNetwork msg_passer;
-	List<Message> message_queue = new ArrayList<Message>();
+	P2PNetwork p2p;
 
-	public Connection(Socket aClientSocket, P2PNetwork msg_passer) {
-		this.msg_passer = msg_passer;
+	public Connection(Socket aClientSocket, P2PNetwork p2p) {
+		this.p2p = p2p;
 		try {
 			clientSocket = aClientSocket;
 			in = new DataInputStream(clientSocket.getInputStream());
@@ -339,7 +227,6 @@ class Connection extends Thread {
 			inObj = new ObjectInputStream(clientSocket.getInputStream());
 
 			this.start();
-			status = ConnectionStatus.open;
 		} catch (IOException e) {
 			System.out.println("Connection:" + e.getMessage());
 		}
@@ -349,7 +236,7 @@ class Connection extends Thread {
 		try {
 			while (true) {
 				Message message = (Message) inObj.readObject();
-				msg_passer.receive_message(message, this);
+				p2p.receive_message(message, this);
 			}
 
 		} catch (EOFException e) {
@@ -360,7 +247,6 @@ class Connection extends Thread {
 		} finally {
 			try {
 				if (clientSocket != null) {
-					msg_passer.remove_connection(this);
 					clientSocket.close();
 				}
 			} catch (IOException e) {
@@ -381,60 +267,13 @@ class Connection extends Thread {
 		}
 	}
 
-	public void enqueue(Message message) {
-		synchronized (message_queue) {
-			this.message_queue.add(message);
-		}
-	}
-
-	public void set_status(ConnectionStatus status) {
-		synchronized (this.status){
-			this.status = status;
-			synchronized (message_queue) {
-				if (status == ConnectionStatus.ready && !this.message_queue.isEmpty()) {
-					for (Message msg : message_queue) {
-						write_object(msg);
-					}
-					message_queue.clear();
-				}
-			}
-		}
-	}
-
-	public void send_marco(Message marco) {
-		this.write_object(marco);
-	}
-
-	public void send_polo(Message polo) {
-		this.write_object(polo);
-	}
-
 	public void close() {
 		try {
 			this.clientSocket.close();
 		} catch (IOException e) {
 			System.out.println("Failed to close connection: ");
-			this.print();
 			e.printStackTrace();
 		}
 	}
 
-	public static String statusToString(ConnectionStatus status) {
-		switch (status) {
-		case closed:
-			return "closed";
-		case open:
-			return "open";
-		case ready:
-			return "ready";
-		default:
-			return "none";
-		}
-	}
-
-	public void print() {
-		System.out.println("Connection status: " + statusToString(this.status));
-		System.out.println("Remote Address: " + this.clientSocket.getRemoteSocketAddress());
-		System.out.println("Local Address: " + this.clientSocket.getLocalSocketAddress());
-	}
 }

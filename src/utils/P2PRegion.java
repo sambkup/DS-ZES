@@ -1,7 +1,10 @@
 package utils;
 
-public class P2PRegion {
+import java.io.Serializable;
+
+public class P2PRegion implements Serializable{
 	
+	private static final long serialVersionUID = -5261576759484517052L;
 	private double[] range = new double[4];
 	
 	public P2PRegion(double min_lat, double max_lat, double min_long, double max_long){
