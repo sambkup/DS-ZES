@@ -11,11 +11,13 @@ public class Node implements Serializable {
 	public String address = null;
 	NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
+	public NodeLocation nodeLocation;
 
-	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, int port, String ip) {
+	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation nodeLocation,int port, String ip) {
 
 		this.myPatrolArea = myPatrolArea;
 		this.p2pPatrolArea = p2pPatrolArea;
+		this.nodeLocation = nodeLocation;
 		this.port = port;
 		this.ip = ip;
 		this.address = String.format("/%s:%d", this.ip, this.port);

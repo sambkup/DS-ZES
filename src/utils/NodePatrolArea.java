@@ -16,7 +16,7 @@ public class NodePatrolArea implements Serializable{
 	}
 	public NodePatrolArea(double[] range ){
 		if (range.length != 4){
-			//TODO: throw error
+			//TODO: throw exception
 		}
 		
 		this.range[0]=range[0];
@@ -24,7 +24,22 @@ public class NodePatrolArea implements Serializable{
 		this.range[2]=range[2];
 		this.range[3]=range[3];
 	}
-
+	
+	/**
+	 * @param testLocation
+	 * @return
+	 * Returns true if given location is within my region
+	 * Returns false if given location is not within my region
+	 */
+	public boolean inMyArea(NodeLocation testLocation){
+		double[] testCoordinates = testLocation.getLocation();
+		if (testCoordinates[0] > range[2] || testCoordinates[0] < range[0]){
+			if(testCoordinates[1] > range[3] || testCoordinates[1] < range[1] ){
+				return false;
+			}
+		}
+		return true;
+	}
 
 
 	/**
