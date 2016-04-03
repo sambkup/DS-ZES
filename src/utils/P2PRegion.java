@@ -27,6 +27,22 @@ public class P2PRegion implements Serializable{
 		this.range[2]=range[2];
 		this.range[3]=range[3];
 	}
+	
+	/**
+	 * @param testRegion
+	 * @return
+	 * Returns true if same region
+	 * Returns false if not same region
+	 */
+	public boolean equals(P2PRegion testRegion){
+		double[] testRange = testRegion.getRange();
+		for (int i = 0; i< range.length; i++){
+			if(testRange[i] != range[i]){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	
 

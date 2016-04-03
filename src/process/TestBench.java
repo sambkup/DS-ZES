@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import communication.Message;
 import communication.P2PNetwork;
 import utils.Node;
+import utils.NodeLocation;
 import utils.NodePatrolArea;
 import utils.P2PRegion;
 
@@ -25,25 +26,13 @@ public class TestBench {
 	/*
 	 * TODO:
 	 * Refactor:
-	 * - Remove config file stuff
-	 * - Remove need for only 1 socket
-	 * - Remove send/receive rules
 	 * - Add a bootstrapping skeleton to start looking for nodes in a network
-	 * - Configureation.java should hold details about the P2P network  
+	 * - P2PNetwork.java should hold details about the P2P network  
 	 * -- neighboring nodes
-	 * -- my location
-	 * -- my data
-	 * -- 
 	 * 
 	 * Bootstrapping:
-	 * - Broadcast to all IPs similar to mine
-	 * - All 'servers' should have a fixed port
-	 * - serially ping server/ports
-	 * - maybe a small timeout?
 	 * - Just need to find one, and that will help you get to the next one
-	 * - For demo, serially check every port in localhost
-	 * 
-	 * - change code to use ports so I can start testing again
+	 * - Figure out how to divide up the network
 	 * 
 	 */
 	
@@ -62,13 +51,28 @@ public class TestBench {
 		// Ports can be in the range 4000 - 4200 (can be increased if needed)
 		port = 4011;
 		
-		double[] range = {80.9000,-90.000,80.9000,-90.000};
+		/* CMU is not perfectly alightned north/south
+		 * Southwest corner: 40.441713 | Longitude: -79.947789
+		 * Southeast corner: 40.440309 | Longitude: -79.941298 (roughly)
+		 * Northwest corner: 40.444963 | Longitude: -79.946405 (roughly)
+		 * Northeast corner: 40.443844 | Longitude: -79.947789 (roughly)
+		 * 
+		 * Position 1: 40.443052 | Longitude: -79.944806
+		 * Position 2: 40.442546 | Longitude: -79.941759
+		 */
+		
+		
+		
+		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
+		double[] location = {40.443052,-79.944806};
+//		double[] location = {40.442546,-79.941759};
 		P2PRegion region = new P2PRegion(range);
 		NodePatrolArea initial_patrol_area = new NodePatrolArea(range);
+		NodeLocation node_loc = new NodeLocation(location);
 //		String IP = findMyIPaddr();
 //		String IP = "10.0.0.183";
 		String IP = "127.0.0.1";
-		myself = new Node(initial_patrol_area,region,port,IP);
+		myself = new Node(initial_patrol_area,region,node_loc,port,IP);
 
 		// --------------------------------
 		// construct the required objects
