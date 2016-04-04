@@ -10,7 +10,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+
+import communication.Message.messageKind;
 import utils.Node;
 
 public class P2PNetwork {
@@ -20,14 +24,17 @@ public class P2PNetwork {
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
 	
-	List<Node> foundNodes;
+	HashMap<String, Node> foundNodes;
+//	List<Node> foundNodes;
 	List<Node> neighborNodes;
 
 	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
-		this.foundNodes = new ArrayList<Node>();
+//		this.foundNodes = new ArrayList<Node>();
+		this.foundNodes = new HashMap<String, Node>();
+
 		
 		this.localNode = myself;
 
@@ -73,7 +80,7 @@ public class P2PNetwork {
 				// if a socket successfully opened
 				s.close();
 				System.out.println(testIP+":"+port + " - Found first node");	
-				Message message = new Message(testIP, port,"getParam",this.localNode);
+				Message message = new Message(testIP, port,messageKind.GET_PARAM,this.localNode);
 				send(message);	
 				return true;
 			} catch (UnknownHostException e) {
@@ -138,20 +145,53 @@ public class P2PNetwork {
 	}
 
 	public synchronized void receive_message(Message message, Connection c) {
-		if (message.kind.equals("getParam")) {
-			System.out.println("Recevied \"getParam\"");
-			Node newNode = message.getNode();
-			this.foundNodes.add(newNode);
-			Message msg = new Message(newNode.ip,newNode.port,"parameters", this.localNode);
-			this.send(msg);
+		
+		Node newNode = message.getNode();
+		
+		switch (message.kind) {
+		case GET_PARAM:
+			System.out.println("Recevied \"GET_PARAM\"");
+			this.send(new Message(newNode.ip,newNode.port,messageKind.GET_PARAM_RESPONSE, this.localNode));
 			return;
-		}  else if (message.kind.equals("parameters")){
-			// add this node's parameters to myself
-			System.out.println("Recevied \"parameters\"");
-			Node newNode = message.getNode();
-			this.foundNodes.add(newNode);
-			// TODO: take some action to place myself
+			
+		case GET_PARAM_RESPONSE:
+			System.out.println("Recevied \"GET_PARAM_RESPONSE\"");
+			this.foundNodes.put(newNode.getName(), newNode);
+			// request to update patrol region
+			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
 			return;
+			
+		case REQ_UPDATED_PATROL:
+			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
+			if (!localNode.inMyArea(newNode)){
+				// node not in my region
+				// TODO: find which node the newNode should ask next
+				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, this.localNode));
+			}
+			else{
+				// send newNode's location
+				newNode = localNode.splitPatrolArea(newNode);
+				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode));
+
+				// store new Node:
+				this.foundNodes.put(newNode.getName(), newNode);
+				
+				// send my updated location
+				this.send(new Message(newNode.ip,newNode.port,messageKind.SEND_UPDATED_PARAM, this.localNode));
+			}
+			return;
+			
+		case SEND_UPDATED_PARAM:
+			this.foundNodes.put(newNode.getName(), newNode);
+			return;
+			
+		case SEND_PARAM:
+			System.out.println("Recevied \"SEND_PARAM\"");
+			this.foundNodes.put(newNode.getName(), newNode);
+			return;
+						
+		default:
+			break;
 		}
 		
 		// the receive buffer from the Homeworks
@@ -197,10 +237,17 @@ public class P2PNetwork {
 
 	public void printFoundNodes(){
 		System.out.println("Printing Found Nodes----------");
-		int numFoundNodes = this.foundNodes.size();
-		for (int i = 0; i<numFoundNodes; i++){
-			System.out.println(i+": "+this.foundNodes.get(i).toString());
+		System.out.println(this.localNode.getName()+" : "+this.localNode.toString());
+		
+		for (Entry<String, Node> entry : this.foundNodes.entrySet()) {
+		    System.out.println(entry.getKey()+" : "+entry.getValue());
 		}
+
+//		int numFoundNodes = this.foundNodes.size();
+//		for (int i = 0; i<numFoundNodes; i++){
+////			System.out.println(" "+i+": "+this.foundNodes.get(i).toString());
+//			System.out.println(" "+i+": "+this.foundNodes..get(i).toString());
+//		}
 		System.out.println("------------------------------");
 	}
 	

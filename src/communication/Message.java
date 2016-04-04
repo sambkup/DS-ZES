@@ -8,12 +8,23 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
 	String destIP;
 	int destPort;
-	String kind;
+	messageKind kind;
 	Node node;
 
 	int seqNum;
 
-	public Message(String destIP,int port, String kind, Node node) {
+	public enum messageKind{
+		GET_PARAM, 				// request parameters of the foreign node, send myself
+		GET_PARAM_RESPONSE,  		// response to getParam - send my parameters
+		SEND_PARAM, 			// send my parameters
+		SEND_UPDATED_PARAM,		// send my updated parameters (assume my parameters are already stored)
+		REQ_UPDATED_PATROL,		// request node to divide region with me.
+		UPDATE_PATROL_NACK,	// - NACK if not in my region & NODE = next node to ask
+		UPDATE_PATROL_ACK	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+	}
+
+	
+	public Message(String destIP, int port, messageKind kind, Node node) {
 		this.destIP = destIP;
 		this.destPort = port;
 		this.kind = kind;
@@ -34,11 +45,11 @@ public class Message implements Serializable {
 		// set the sequence number for this message
 	}
 
-	public String getKind() {
+	public messageKind getKind() {
 		return kind;
 	}
 
-	public void setKind(String kind) {
+	public void setKind(messageKind kind) {
 		this.kind = kind;
 	}
 	

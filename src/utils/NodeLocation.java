@@ -16,12 +16,22 @@ public class NodeLocation implements Serializable{
 		this.location[1]=location[1];
 	}
 
+	public NodeLocation clone(){
+		return new NodeLocation(this.location);
+	}
+
+	
 	/**
 	 * @return the location
 	 */
 	public double[] getLocation() {
 		return location;
 	}
+	
+	public String toString() {
+		return String.format("(%f,%f)", location[0],location[1]);
+	}
+
 
 
 }

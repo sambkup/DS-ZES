@@ -6,16 +6,7 @@ public class P2PRegion implements Serializable{
 	
 	private static final long serialVersionUID = -5261576759484517052L;
 	private double[] range = new double[4];
-	
-	public P2PRegion(double min_lat, double max_lat, double min_long, double max_long){
-		range = new double[4];
-		range[0]=min_lat;
-		range[1]=max_lat;
-		range[2]=min_long;
-		range[3]=max_long;
-		
-		// TODO: do some bounds checking so the min<max.  If not throw error.
-	}
+	// range = [lat_min,long_min, lat_max,long_max]
 	
 	public P2PRegion(double[] range){
 		if (range.length != 4){
@@ -27,6 +18,11 @@ public class P2PRegion implements Serializable{
 		this.range[2]=range[2];
 		this.range[3]=range[3];
 	}
+	
+	public P2PRegion clone(){
+		return new P2PRegion(this.range);
+	}
+
 	
 	/**
 	 * @param testRegion
