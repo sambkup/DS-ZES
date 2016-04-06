@@ -25,14 +25,12 @@ public class P2PNetwork {
 	List<Message> receive_queue;
 	
 	HashMap<String, Node> foundNodes;
-//	List<Node> foundNodes;
 	List<Node> neighborNodes;
 
 	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
-//		this.foundNodes = new ArrayList<Node>();
 		this.foundNodes = new HashMap<String, Node>();
 
 		

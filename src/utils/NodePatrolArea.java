@@ -55,7 +55,7 @@ public class NodePatrolArea implements Serializable{
 		if ((range[2]-range[0]) >= (range[3]-range[1])){
 			// latt is longer, so split along latt
 			
-			double split = range[2]-range[0]/2;
+			double split = (range[2]-range[0])/2 + range[0];
 			
 			// same longitude
 			newRange[3] = range[3];
@@ -71,7 +71,7 @@ public class NodePatrolArea implements Serializable{
 		} else {
 			// latt is longer, so split along latt
 			
-			double split = range[3]-range[1]/2;
+			double split = (range[3]-range[1])/2 + range[1];
 			
 			// same latitude
 			newRange[2] = range[2];
