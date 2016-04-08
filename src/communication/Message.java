@@ -1,6 +1,7 @@
 package communication;
 
 import java.io.Serializable;
+import org.json.JSONObject;
 
 import utils.Node;
 
@@ -10,7 +11,11 @@ public class Message implements Serializable {
 	int destPort;
 	messageKind kind;
 	Node node;
-
+	String destLoc; //lat,lng, to store the destination of user
+	String startNodeIP;
+	JSONObject jsonRoute;
+	String phoneIP;
+	int phonePort;
 	int seqNum;
 
 	public enum messageKind{
@@ -20,7 +25,11 @@ public class Message implements Serializable {
 		SEND_UPDATED_PARAM,		// send my updated parameters (assume my parameters are already stored)
 		REQ_UPDATED_PATROL,		// request node to divide region with me.
 		UPDATE_PATROL_NACK,	// - NACK if not in my region & NODE = next node to ask
-		UPDATE_PATROL_ACK	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+		UPDATE_PATROL_ACK,	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+		REQ_START, //message sent from phone to nodes to get a start node
+		MY_AREA, //response sent from node to phone saying if it's in the node's patrol area
+		NOT_MY_AREA, //response sent from node to phone saying the user is not in user's patrol area
+		MSG_JSON //JSON Object passed around
 	}
 
 	
@@ -49,6 +58,7 @@ public class Message implements Serializable {
 		return kind;
 	}
 
+
 	public void setKind(messageKind kind) {
 		this.kind = kind;
 	}
@@ -66,6 +76,43 @@ public class Message implements Serializable {
 	public void setNode(Node node) {
 		this.node = node;
 	}
+	
+	public String getDestLoc() {
+		return destLoc;
+	}
+
+	public void setDestLoc(String destLoc) {
+		this.destLoc = destLoc;
+	}
+
+	public String getStartNodeIP() {
+		return startNodeIP;
+	}
+
+	public void setStartNodeIP(String startNodeIP) {
+		this.startNodeIP = startNodeIP;
+	}
+
+
+	public void setDestIP(String destIP) {
+		this.destIP = destIP;
+	}
+
+	public void setDestPort(int destPort) {
+		this.destPort = destPort;
+	}
+
+	public JSONObject getJsonRoute() {
+		return jsonRoute;
+	}
+
+	public void setJsonRoute(JSONObject jsonRoute) {
+		this.jsonRoute = jsonRoute;
+	}
+
+	public void setPhoneIP(String phoneIP) { this.phoneIP = phoneIP; }
+
+	public void setPhonePort(int phonePort) {this.phonePort = phonePort;}
 
 	
 

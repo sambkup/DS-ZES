@@ -25,7 +25,7 @@ public class TestBench {
 	/*
 	 * TODO:
 	 * Refactor:
-	 * - P2PNetwork.java should hold details about the P2P network  
+	 * -- P2PNetwork.java should hold details about the P2P network  
 	 * -- neighboring nodes
 	 * 
 	 * Bootstrapping:
@@ -54,8 +54,10 @@ public class TestBench {
 	public static void main(String[] args) {
 		// --------------------------------
 		// initialize - get necessary parameter inputs
+		int port = Integer.parseInt(args[0]);
+		
 
-		int port = 4050; // Ports can be in the range 4000 - 4200
+	//	int port = 4050; // Ports can be in the range 4000 - 4200
 		String IP = "127.0.0.1"; // localhost
 		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
 //		double[] location = {40.443052,-79.944806};
@@ -81,7 +83,7 @@ public class TestBench {
 	}
 	
 	
-	private static void run_receiver(P2PNetwork p2p) {
+	private static void run_receiver(final P2PNetwork p2p) {
 		Thread receiver_thread = new Thread() {
 			public void run() {
 				while (true) {

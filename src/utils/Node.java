@@ -2,6 +2,9 @@ package utils;
 
 import java.io.Serializable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Node implements Serializable {
 	
 	private static final long serialVersionUID = -6754243543644721809L;
@@ -12,6 +15,7 @@ public class Node implements Serializable {
 	NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
+	public String state = "SAFE";
 
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation,int port, String ip) {
 
@@ -49,6 +53,16 @@ public class Node implements Serializable {
 	public String getName(){
 		return "("+this.ip+":"+this.port+")";
 	}
+	public String getState() {
+		return state;
+	}
+	public JSONObject enterJSON(JSONObject route) throws JSONException{
+		int count = route.length();
+		count = count+1;
+		route.put(String.valueOf(count),myLocation);
+		return route;
+	}
+
 	
 	public String toString() {
 		return String.format("(%s:%d), %s, %s", ip, port,myLocation.toString() , myPatrolArea.toString());

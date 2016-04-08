@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import communication.Message.messageKind;
 import utils.Node;
+import org.json.*;
 
 public class P2PNetwork {
 
@@ -145,6 +146,7 @@ public class P2PNetwork {
 	public synchronized void receive_message(Message message, Connection c) {
 		
 		Node newNode = message.getNode();
+		System.out.println(message.getNode().toString());
 		
 		switch (message.kind) {
 		case GET_PARAM:
@@ -168,7 +170,10 @@ public class P2PNetwork {
 			}
 			else{
 				// send newNode's location
-				newNode = localNode.splitPatrolArea(newNode);
+		
+		
+					newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone
+				
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode));
 
 				// store new Node:
@@ -187,6 +192,62 @@ public class P2PNetwork {
 			System.out.println("Recevied \"SEND_PARAM\"");
 			this.foundNodes.put(newNode.getName(), newNode);
 			return;
+			case REQ_START:
+				System.out.println("Received \"REQ_START\"");
+				/* check if myloc is within my patrol area */
+				if(this.localNode.inMyArea(newNode))	{
+					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
+				}
+				else{
+					this.send(new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode));
+				}
+				return;
+			case MSG_JSON:
+				System.out.println("Received \"MSG_JSON\"");
+			/*	//if final JSON, send it to the phone. if I am the phone, myip = phoneip. then pass it back to clientActivtiy
+				if((localNode.ip.equalsIgnoreCase(message.phoneIP))&(localNode.port==message.phonePort)) {
+					ClientActivity.getInstance().setJSONObjectToSendInstance(message.getJsonRoute());
+					return;
+				}
+*/
+
+
+				//if start node = myself,I am the device and  it is the final JSON, send it to the phone
+				if(message.getStartNodeIP().equalsIgnoreCase(localNode.ip)){
+					message.setDestIP(message.phoneIP);  //setting as phone
+					message.setDestPort(message.phonePort);
+
+				}
+				else{
+					message.setDestIP(this.foundNodes.get(1).ip);  //setting as first neighbour, should change to nearest node
+					message.setDestPort(this.foundNodes.get(1).port);
+
+				}
+
+
+
+				//if destLoc is in my patrol area, add my location to json and send to start node
+				JSONObject newJSON = message.getJsonRoute();
+					//Add my location to the json Object if I'm safe, send it to my nearest neighbour
+				if(this.localNode.getState().equalsIgnoreCase("SAFE")){
+					try {
+						newJSON = this.localNode.enterJSON(message.getJsonRoute());
+					}catch (Exception ex){
+						System.out.println("error in entering my location to JSON");
+					}
+				}
+				//send JSON and message to next node
+				message.setJsonRoute(newJSON);
+
+				this.send(message);
+				return;
+			case MY_AREA:
+				System.out.println("Received \"MY_AREA\"");
+				//establish a permanent connection with it and wait for JSON
+				this.send(new Message(newNode.ip,newNode.port,messageKind.MSG_JSON, this.localNode));
+				return;
+
+			
 						
 		default:
 			break;
@@ -287,7 +348,7 @@ class Connection extends Thread {
 			System.out.println("Server EOF:" + e.getMessage());
 		} catch (IOException e) {
 		} catch (ClassNotFoundException e) {
-			System.out.println("Failed to convert received object!");
+			System.out.println("Failed to convert received object! ");
 		} finally {
 			try {
 				if (clientSocket != null) {
