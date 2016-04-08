@@ -20,7 +20,8 @@ public class Message implements Serializable {
 		SEND_UPDATED_PARAM,		// send my updated parameters (assume my parameters are already stored)
 		REQ_UPDATED_PATROL,		// request node to divide region with me.
 		UPDATE_PATROL_NACK,	// - NACK if not in my region & NODE = next node to ask
-		UPDATE_PATROL_ACK	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+		UPDATE_PATROL_ACK,	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+		HEART_BEAT			// simple message to prove connection is still alive
 	}
 
 	

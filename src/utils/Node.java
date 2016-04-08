@@ -1,6 +1,10 @@
 package utils;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Serializable;
+
+import javax.swing.Timer;
 
 public class Node implements Serializable {
 	
@@ -12,7 +16,8 @@ public class Node implements Serializable {
 	NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
-
+	public Timer timer; // used for heart beat code
+	
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation,int port, String ip) {
 
 		this.myPatrolArea = myPatrolArea;
@@ -48,6 +53,16 @@ public class Node implements Serializable {
 	
 	public String getName(){
 		return "("+this.ip+":"+this.port+")";
+	}
+	
+	// heartbeat uses this getter
+	public String getIP(){
+		return this.ip;
+	}
+	
+	// heartbeat uses this getter
+	public int getPort(){
+		return this.port;
 	}
 	
 	public String toString() {

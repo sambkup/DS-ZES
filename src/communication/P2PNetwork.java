@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import communication.Message.messageKind;
+import services.HeartBeatPulse;
 import utils.Node;
 
 public class P2PNetwork {
@@ -25,7 +26,7 @@ public class P2PNetwork {
 	List<Message> receive_queue;
 	
 	HashMap<String, Node> foundNodes;
-	List<Node> neighborNodes;
+	public List<Node> neighborNodes;
 
 	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
@@ -55,7 +56,6 @@ public class P2PNetwork {
 		if (!findFirstNodeByPort()){
 			System.out.println("I am the first node");
 		}
-		
 	}
 
 	public boolean findFirstNodeByPort(){
@@ -187,6 +187,10 @@ public class P2PNetwork {
 			System.out.println("Recevied \"SEND_PARAM\"");
 			this.foundNodes.put(newNode.getName(), newNode);
 			return;
+			
+		case HEART_BEAT:
+			System.out.println("Received \"HEART_BEAT\"");
+			// update watchdog timer for node
 						
 		default:
 			break;
@@ -249,6 +253,14 @@ public class P2PNetwork {
 		System.out.println("------------------------------");
 	}
 	
+	// used by heart beat - getter
+	public List<Node> getListOfNeighbors(){
+		return this.neighborNodes;
+	}
+	// used by heart beat - getter
+	public Node getLocalNode(){
+		return this.localNode;
+	}
 }
 
 class Connection extends Thread {
@@ -319,5 +331,4 @@ class Connection extends Thread {
 			e.printStackTrace();
 		}
 	}
-
 }

@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import communication.P2PNetwork;
+import services.HeartBeatPulse;
 import utils.Node;
 import utils.NodeLocation;
 import utils.NodePatrolArea;
@@ -56,7 +57,7 @@ public class TestBench {
 		// initialize - get necessary parameter inputs
 
 		int port = 4050; // Ports can be in the range 4000 - 4200
-		String IP = "127.0.0.1"; // localhost
+		String IP = "127.0.0.7"; // localhost
 		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
 //		double[] location = {40.443052,-79.944806};
 		double[] location = {40.442546,-79.941759}; // a second spot on campus
@@ -71,7 +72,10 @@ public class TestBench {
 		myNode = new Node(initial_patrol_area,region,node_loc,port,IP);
 
 		p2p = new P2PNetwork(myNode);
-
+		
+		// start heart beat thread
+		HeartBeatPulse HB = new HeartBeatPulse(p2p);
+		HB.run();
 				
 		// --------------------------------
 		// Execute something here
@@ -81,7 +85,7 @@ public class TestBench {
 	}
 	
 	
-	private static void run_receiver(P2PNetwork p2p) {
+	private static void run_receiver(final P2PNetwork p2p) {
 		Thread receiver_thread = new Thread() {
 			public void run() {
 				while (true) {
