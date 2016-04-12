@@ -19,7 +19,7 @@ import utils.NodeLocation;
 import utils.NodePatrolArea;
 import utils.P2PRegion;
 
-public class SensorNode {
+public class SensorNode2 {
 	
 	protected static final String receive_block = new String();
 	static P2PNetwork p2p;
@@ -37,8 +37,8 @@ public class SensorNode {
 
 		String IP = findMyIPaddr(); // localhost
 		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
-//		double[] location = {40.443052,-79.944806};
-		double[] location = {40.442546,-79.941759}; // a second spot on campus
+		double[] location = {40.443052,-79.944806};
+//		double[] location = {40.442546,-79.941759}; // a second spot on campus
 		
 
 		// --------------------------------
