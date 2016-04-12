@@ -77,7 +77,7 @@ public class P2PNetwork {
 			try {
 				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
 				s = new Socket();
-				s.connect(endpoint, 50);
+				s.connect(endpoint, 60);
 				
 				s.close();
 				System.out.println(testIP+":"+this.localNode.port + " - Found first node");	
@@ -143,11 +143,8 @@ public class P2PNetwork {
 
 		try {
 			s = new Socket(ip, port);
-			System.out.println("connection created");
 			s.setKeepAlive(true);
-
 			connection_to_use = new Connection(s, this);
-			System.out.println("Connection created");
 			
 		} catch (UnknownHostException e) {
 			System.out.println("Client Socket error:" + e.getMessage());
@@ -163,7 +160,6 @@ public class P2PNetwork {
 			return;
 		}
 
-		System.out.println("Sending message");
 		connection_to_use.write_object(message);
 		connection_to_use.close();
 
@@ -224,14 +220,17 @@ public class P2PNetwork {
 			return;
 			
 		case UPDATE_PATROL_NACK:
+			System.out.println("Recevied \"UPDATE_PATROL_NACK\"");
 			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, newNode));
 			return;
 		case UPDATE_PATROL_ACK:
+			System.out.println("Recevied \"UPDATE_PATROL_ACK\"");
 			// Update my node's information
 			this.localNode = newNode;
 			return;
 					
 		case SEND_UPDATED_PARAM:
+			System.out.println("Recevied \"SEND_UPDATED_PARAM\"");
 			synchronized(this.neighborNodes){
 				this.neighborNodes.put(newNode.getName(), newNode);
 			}
