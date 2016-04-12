@@ -6,18 +6,18 @@ import org.json.JSONObject;
 import utils.Node;
 
 public class Message implements Serializable {
-	private static final long serialVersionUID = 1L;
-	String destIP;
-	int destPort;
-	messageKind kind;
-	Node node;
-	String destLoc; //lat,lng, to store the destination of user
-	String startNodeIP;
-	JSONObject jsonRoute;
-	String phoneIP;
-	int phonePort;
+	private static final long serialVersionUID = 45;
+	public String destIP;
+	public int destPort;
+	public messageKind kind;
+	public Node node;
+	public String destLoc; //lat,lng, to store the destination of user
+	public String startNodeIP;
+	public JSONObject jsonRoute;
+	public String phoneIP;
+	public int phonePort;
 	int seqNum;
-
+	
 	public enum messageKind{
 		GET_PARAM, 				// request parameters of the foreign node, send myself
 		GET_PARAM_RESPONSE,  		// response to getParam - send my parameters

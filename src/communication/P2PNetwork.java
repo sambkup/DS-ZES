@@ -1,8 +1,10 @@
 package communication;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,10 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import communication.Message.messageKind;
 import utils.Node;
 import org.json.*;
+
 
 public class P2PNetwork {
 
@@ -103,6 +108,7 @@ public class P2PNetwork {
 
 		try {
 			s = new Socket(ip, port);
+			System.out.println("connection created");
 			s.setKeepAlive(true);
 
 			connection_to_use = new Connection(s, this);
@@ -114,6 +120,7 @@ public class P2PNetwork {
 			System.out.println("Client EOF error:" + e.getMessage());
 		} catch (IOException e) {
 			System.out.println("Client readline error:" + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		if (connection_to_use == null) {
@@ -146,8 +153,7 @@ public class P2PNetwork {
 	public synchronized void receive_message(Message message, Connection c) {
 		
 		Node newNode = message.getNode();
-		System.out.println(message.getNode().toString());
-		
+	
 		switch (message.kind) {
 		case GET_PARAM:
 			System.out.println("Recevied \"GET_PARAM\"");
@@ -192,9 +198,10 @@ public class P2PNetwork {
 			System.out.println("Recevied \"SEND_PARAM\"");
 			this.foundNodes.put(newNode.getName(), newNode);
 			return;
-			case REQ_START:
+		case REQ_START:
 				System.out.println("Received \"REQ_START\"");
 				/* check if myloc is within my patrol area */
+				System.out.println(message.toString());
 				if(this.localNode.inMyArea(newNode))	{
 					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 				}
@@ -202,7 +209,7 @@ public class P2PNetwork {
 					this.send(new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode));
 				}
 				return;
-			case MSG_JSON:
+		case MSG_JSON:
 				System.out.println("Received \"MSG_JSON\"");
 			/*	//if final JSON, send it to the phone. if I am the phone, myip = phoneip. then pass it back to clientActivtiy
 				if((localNode.ip.equalsIgnoreCase(message.phoneIP))&(localNode.port==message.phonePort)) {
@@ -338,17 +345,24 @@ class Connection extends Thread {
 	}
 
 	public void run() {
+		Gson gson = new Gson();
 		try {
 			while (true) {
-				Message message = (Message) inObj.readObject();
+				
+			//	Message message = (Message)inObj.readObject();
+				
+				String json = in.readUTF();
+				Message message = gson.fromJson(json, Message.class);
+				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 
 		} catch (EOFException e) {
 			System.out.println("Server EOF:" + e.getMessage());
 		} catch (IOException e) {
-		} catch (ClassNotFoundException e) {
-			System.out.println("Failed to convert received object! ");
+			System.out.println(e.getMessage());
+
+			
 		} finally {
 			try {
 				if (clientSocket != null) {
