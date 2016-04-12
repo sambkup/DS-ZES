@@ -36,9 +36,8 @@ public class SensorNode2 {
 		
 
 		String IP = findMyIPaddr(); // localhost
-		double[] range = {40.441713,-79.947789,40.443844,-79.947789};
-		double[] location = {40.443052,-79.944806};
-//		double[] location = {40.442546,-79.941759}; // a second spot on campus
+		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
+		double[] location = {40.443077,-79.942227};
 		
 
 		// --------------------------------
