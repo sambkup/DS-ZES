@@ -25,14 +25,15 @@ public class P2PNetwork {
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
 	
-	HashMap<String, Node> foundNodes;
-	List<Node> neighborNodes;
+//	HashMap<String, Node> foundNodes;
+	HashMap<String, Node> neighborNodes;
 
 	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
-		this.foundNodes = new HashMap<String, Node>();
+//		this.foundNodes = new HashMap<String, Node>();
+		this.neighborNodes = new HashMap<String, Node>();
 
 		
 		this.localNode = myself;
@@ -80,7 +81,7 @@ public class P2PNetwork {
 				
 				s.close();
 				System.out.println(testIP+":"+this.localNode.port + " - Found first node");	
-				Message message = new Message(testIP, this.localNode.port,messageKind.GET_PARAM,this.localNode);
+				Message message = new Message(testIP, this.localNode.port,messageKind.REQ_UPDATED_PATROL,this.localNode);
 				send(message);	
 				return true;
 				
@@ -97,6 +98,7 @@ public class P2PNetwork {
 	}
 
 
+	@SuppressWarnings("unused")
 	private boolean findFirstNodeByPort(){
 		String testIP = this.localNode.ip;
 		int localport = this.localNode.port;
@@ -195,42 +197,51 @@ public class P2PNetwork {
 			
 		case GET_PARAM_RESPONSE:
 			System.out.println("Recevied \"GET_PARAM_RESPONSE\"");
-			this.foundNodes.put(newNode.getName(), newNode);
+//			this.foundNodes.put(newNode.getName(), newNode);
 			// request to update patrol region
-			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
+//			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
 			return;
 			
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
+			// check if there is area overlap
 			if (!localNode.inMyArea(newNode)){
 				// node not in my region
 				// TODO: find which node the newNode should ask next
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, this.localNode));
 			}
+			
 			else{
-				// send newNode's location
-		
-		
-					newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone
-				
+				// update the newNode's patrol area
+				newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone
+				// tell it it's new patrol area
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode));
-
-				// store new Node:
-				this.foundNodes.put(newNode.getName(), newNode);
-				
+				// store the new Node locally:
+				this.neighborNodes.put(newNode.getName(), newNode);
 				// send my updated location
 				this.send(new Message(newNode.ip,newNode.port,messageKind.SEND_UPDATED_PARAM, this.localNode));
 			}
 			return;
 			
+		case UPDATE_PATROL_NACK:
+			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, newNode));
+			return;
+		case UPDATE_PATROL_ACK:
+			// Update my node's information
+			this.localNode = newNode;
+			return;
+					
 		case SEND_UPDATED_PARAM:
-			this.foundNodes.put(newNode.getName(), newNode);
+			synchronized(this.neighborNodes){
+				this.neighborNodes.put(newNode.getName(), newNode);
+			}
 			return;
 			
 		case SEND_PARAM:
 			System.out.println("Recevied \"SEND_PARAM\"");
-			this.foundNodes.put(newNode.getName(), newNode);
+//			this.foundNodes.put(newNode.getName(), newNode);
 			return;
+			
 		case REQ_START:
 				System.out.println("Received \"REQ_START\"");
 				/* check if myloc is within my patrol area */
@@ -259,8 +270,8 @@ public class P2PNetwork {
 
 				}
 				else{
-					message.setDestIP(this.foundNodes.get(1).ip);  //setting as first neighbour, should change to nearest node
-					message.setDestPort(this.foundNodes.get(1).port);
+					message.setDestIP(this.neighborNodes.get(1).ip);  //setting as first neighbour, should change to nearest node
+					message.setDestPort(this.neighborNodes.get(1).port);
 
 				}
 
@@ -335,11 +346,11 @@ public class P2PNetwork {
 	}
 
 	public void printFoundNodes(){
-		System.out.println("Printing Found Nodes----------");
-		System.out.println(this.localNode.getName()+" : "+this.localNode.toString());
+		System.out.println("Printing Neighbor Nodes----------");
+		System.out.println(this.localNode.getName()+":\t"+this.localNode.toString());
 		
-		for (Entry<String, Node> entry : this.foundNodes.entrySet()) {
-		    System.out.println(entry.getKey()+" : "+entry.getValue());
+		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+		    System.out.println(entry.getKey()+":\t"+entry.getValue());
 		}
 
 //		int numFoundNodes = this.foundNodes.size();
