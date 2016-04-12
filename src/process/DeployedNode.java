@@ -18,6 +18,7 @@ public class DeployedNode {
 	static NodeLocation node_loc;
 	static Node myNode;
 	static double[] location = new double[2];
+	static String IP;
 
 	public static void main(String[] args) {
 
@@ -28,12 +29,14 @@ public class DeployedNode {
 			// go to a default value
 			location[0] = 40.442546;
 			location[1] = -79.941759;
-		} else if (args.length != 2) {
-			System.out.println("Usage: lattitude longitude");
+			IP = findMyIPaddr(); 
+		} else if (args.length != 3) {
+			System.out.println("Usage: IP lattitude longitude");
 			System.exit(0);
 		} else {
-			location[0] = Double.parseDouble(args[0]);
-			location[1] = Double.parseDouble(args[1]);		
+			IP = args[0];
+			location[0] = Double.parseDouble(args[1]);
+			location[1] = Double.parseDouble(args[2]);		
 		}
 
 		// --------------------------------
@@ -41,7 +44,6 @@ public class DeployedNode {
 		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
 		int port = 4001; 
 
-		String IP = findMyIPaddr(); 
 
 		// --------------------------------
 		// construct the required objects
