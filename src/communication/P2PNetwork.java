@@ -1,13 +1,10 @@
 package communication;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -16,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import communication.Message.messageKind;
 import utils.Node;
 import org.json.*;
@@ -58,13 +53,53 @@ public class P2PNetwork {
 		
 		/* bootstrap */
 		System.out.println("Starting bootstrapping...");
-		if (!findFirstNodeByPort()){
+		if (!findFirstNodeByIP()){
 			System.out.println("I am the first node");
 		}
 		
 	}
+	
+	private boolean findFirstNodeByIP(){
+		String myIP = this.localNode.ip;
+		String delims = "[.]";
+		String[] chunks = myIP.split(delims);
 
-	public boolean findFirstNodeByPort(){
+		int maxIP = 256;
+		String testIP;
+		for (int i = 1; i<maxIP; i++){
+			if (Integer.toString(i).equals(chunks[3])){
+				continue;
+			}
+
+			testIP = chunks[0]+"."+chunks[1]+"."+chunks[2]+"."+i;
+			Socket s = null;
+			try {
+				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
+				s = new Socket();
+				s.connect(endpoint, 100);
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				//System.out.println(testIP + " - Closed");
+				continue;
+			}
+			if (s != null){
+				try {
+					s.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			System.out.println(testIP + " - Found first node");
+			return true;
+		}
+		return false;
+
+	}
+
+
+	private boolean findFirstNodeByPort(){
 		String testIP = this.localNode.ip;
 		int localport = this.localNode.port;
 		int startport = 4000;
@@ -323,8 +358,6 @@ class Connection extends Thread {
 
 	DataInputStream in;
 	DataOutputStream out;
-	ObjectOutputStream outObj;
-	ObjectInputStream inObj;
 
 	Socket clientSocket;
 	P2PNetwork p2p;
@@ -335,8 +368,6 @@ class Connection extends Thread {
 			clientSocket = aClientSocket;
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
-			outObj = new ObjectOutputStream(clientSocket.getOutputStream());
-			inObj = new ObjectInputStream(clientSocket.getInputStream());
 
 			this.start();
 		} catch (IOException e) {
@@ -348,9 +379,7 @@ class Connection extends Thread {
 		Gson gson = new Gson();
 		try {
 			while (true) {
-				
-			//	Message message = (Message)inObj.readObject();
-				
+								
 				String json = in.readUTF();
 				Message message = gson.fromJson(json, Message.class);
 				System.out.println("calling receive message function");
@@ -376,32 +405,21 @@ class Connection extends Thread {
 	}
 
 	public void write_object(Object object) {
-		
+
 		Gson gson = new Gson();
 
 		String json = gson.toJson(object);
-		
-		try {
-		synchronized (out) {
-			this.out.writeUTF(json);
-		}
-	} catch (IOException e) {
-		System.out.println("error sending message - client side:" + e.getMessage());
-		e.printStackTrace();
-	}
 
-		
-		
-		
-		
-//		try {
-//			synchronized (outObj) {
-//				this.outObj.writeObject(object);
-//			}
-//		} catch (IOException e) {
-//			System.out.println("error sending message - client side:" + e.getMessage());
-//			e.printStackTrace();
-//		}
+		try {
+			synchronized (out) {
+				this.out.writeUTF(json);
+			}
+		} catch (IOException e) {
+			System.out.println("error sending message - client side:" + e.getMessage());
+			e.printStackTrace();
+		}
+
+
 	}
 
 	public void close() {
