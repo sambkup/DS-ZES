@@ -376,14 +376,32 @@ class Connection extends Thread {
 	}
 
 	public void write_object(Object object) {
+		
+		Gson gson = new Gson();
+
+		String json = gson.toJson(object);
+		
 		try {
-			synchronized (outObj) {
-				this.outObj.writeObject(object);
-			}
-		} catch (IOException e) {
-			System.out.println("error sending message - client side:" + e.getMessage());
-			e.printStackTrace();
+		synchronized (out) {
+			this.out.writeUTF(json);
 		}
+	} catch (IOException e) {
+		System.out.println("error sending message - client side:" + e.getMessage());
+		e.printStackTrace();
+	}
+
+		
+		
+		
+		
+//		try {
+//			synchronized (outObj) {
+//				this.outObj.writeObject(object);
+//			}
+//		} catch (IOException e) {
+//			System.out.println("error sending message - client side:" + e.getMessage());
+//			e.printStackTrace();
+//		}
 	}
 
 	public void close() {
