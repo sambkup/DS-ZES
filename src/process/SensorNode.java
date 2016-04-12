@@ -32,16 +32,13 @@ public class SensorNode {
 		
 		// --------------------------------
 		// initialize - get necessary parameter inputs
-//		int port = Integer.parseInt(args[0]);
 		int port = 4001;
 		
 
-		String IP = findMyIPaddr(); // localhost
+		String IP = findMyIPaddr();
 		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
 		double[] location = {40.443082,-79.942418}; // a second spot on campus
 		
-
-
 
 		// --------------------------------
 		// construct the required objects

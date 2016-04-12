@@ -77,7 +77,7 @@ public class P2PNetwork {
 			try {
 				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
 				s = new Socket();
-				s.connect(endpoint, 60);
+				s.connect(endpoint, 101);
 				
 				s.close();
 				System.out.println(testIP+":"+this.localNode.port + " - Found first node");	
@@ -89,7 +89,7 @@ public class P2PNetwork {
 				e.printStackTrace();
 			} catch (IOException e) {
 //				socket did not successfully open
-//				System.out.println(testIP+":"+port + " - Closed");
+				System.out.println(testIP+":"+this.localNode.port + " - Closed");
 				continue;
 			}
 		}
