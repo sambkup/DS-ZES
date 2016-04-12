@@ -76,23 +76,21 @@ public class P2PNetwork {
 			try {
 				InetSocketAddress endpoint = new InetSocketAddress(testIP, this.localNode.port);
 				s = new Socket();
-				s.connect(endpoint, 100);
+				s.connect(endpoint, 50);
+				
+				s.close();
+				System.out.println(testIP+":"+this.localNode.port + " - Found first node");	
+				Message message = new Message(testIP, this.localNode.port,messageKind.GET_PARAM,this.localNode);
+				send(message);	
+				return true;
+				
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				//System.out.println(testIP + " - Closed");
+//				socket did not successfully open
+//				System.out.println(testIP+":"+port + " - Closed");
 				continue;
 			}
-			if (s != null){
-				try {
-					s.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			System.out.println(testIP + " - Found first node");
-			return true;
 		}
 		return false;
 
