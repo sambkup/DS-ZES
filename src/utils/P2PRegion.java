@@ -13,11 +13,22 @@ public class P2PRegion implements Serializable{
 			//TODO: throw error
 			System.out.println("length is: "+range.length);
 		}
-		this.range[0]=range[0];
-		this.range[1]=range[1];
-		this.range[2]=range[2];
-		this.range[3]=range[3];
-	}
+		// reorder values if necessary
+		if(range[2]>=range[0]){
+			this.range[0]=range[0];
+			this.range[2]=range[2];
+		}else{
+			this.range[2]=range[0];
+			this.range[0]=range[2];
+		}
+		
+		if(range[3]>=range[1]){
+			this.range[1]=range[1];
+			this.range[3]=range[3];
+		}else{
+			this.range[3]=range[1];
+			this.range[1]=range[3];
+		}	}
 	
 	public P2PRegion clone(){
 		return new P2PRegion(this.range);

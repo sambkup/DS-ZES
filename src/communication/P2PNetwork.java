@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 import com.google.gson.Gson;
 import communication.Message.messageKind;
 import utils.Node;
+import utils.Node.SensorState;
+
 import org.json.*;
 
 
@@ -25,14 +27,12 @@ public class P2PNetwork {
 	List<Message> delay_receive_queue;
 	List<Message> receive_queue;
 	
-//	HashMap<String, Node> foundNodes;
 	HashMap<String, Node> neighborNodes;
 
 	public P2PNetwork(Node myself) {
 		/* Initiate the fields */
 		this.delay_receive_queue = new ArrayList<Message>();
 		this.receive_queue = new ArrayList<Message>();
-//		this.foundNodes = new HashMap<String, Node>();
 		this.neighborNodes = new HashMap<String, Node>();
 
 		
@@ -279,7 +279,7 @@ public class P2PNetwork {
 				//if destLoc is in my patrol area, add my location to json and send to start node
 				JSONObject newJSON = message.getJsonRoute();
 					//Add my location to the json Object if I'm safe, send it to my nearest neighbour
-				if(this.localNode.getState().equalsIgnoreCase("SAFE")){
+				if(this.localNode.getState() == SensorState.SAFE){
 					try {
 						newJSON = this.localNode.enterJSON(message.getJsonRoute());
 					}catch (Exception ex){
@@ -342,6 +342,25 @@ public class P2PNetwork {
 			}
 		}
 
+	}
+	
+	
+	@SuppressWarnings("unused")
+	private Node findNextNeighbor(Node testNode){
+		/*
+		 * Look through all the neighbors. 
+		 * If any neighbor contains the new node, then return that neighbor
+		 * If no neighbor contains it, figure out which neighbor should be checked next.
+		 */
+		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+		    if (entry.getValue().inMyArea(testNode)){
+		    	return entry.getValue();
+		    }
+		}
+		
+		
+ 
+		return null;
 	}
 
 	public void printFoundNodes(){
