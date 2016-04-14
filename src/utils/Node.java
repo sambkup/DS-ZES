@@ -79,6 +79,10 @@ public class Node implements Serializable {
 		this.address = String.format("/%s:%d", this.ip, this.port);
 	}
 
+	public Node() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Node clone() {
 		return new Node(this.myPatrolArea.clone(), this.p2pPatrolArea.clone(), this.myLocation.clone(), this.port,
 				this.ip);
@@ -117,26 +121,26 @@ public class Node implements Serializable {
 	/**
 	 * @param testNode,
 	 *            neighborNodes
-	 * @return Given a node, determine the closest node from my neighbors and return it's IP
+	 * @return Given a node, determine the closest node from my neighbors and return the node
 	 */
-	public String findClosestNode(Node testNode, HashMap<String, Node> neighborNodes) {
-		String returnIP = null;
+	public Node findClosestNode(Node testNode, HashMap<String, Node> neighborNodes) {
+		Node returnNode = null;
 		double minDistance = 0;
 		for (String key : neighborNodes.keySet()) {
 			Node neighbor = neighborNodes.get(key);
 			double dist = this.distance(this, neighbor);
 			if (minDistance == 0) {
 				minDistance = dist;
-				returnIP = neighbor.ip;
+				returnNode = neighbor;
 				continue;
 			}
 			if (dist < minDistance) {
-				returnIP = neighbor.ip;
+				returnNode = neighbor;
 			}
 		}
-		return returnIP;
+		return returnNode;
 	}
-
+	
 	public boolean isNeighbor(Node testNode) {
 		return myPatrolArea.isNeighbor(testNode.myPatrolArea);
 	}

@@ -13,9 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import com.google.gson.Gson;
+import com.sun.xml.internal.ws.util.xml.NodeListIterator;
+
 import communication.Message.messageKind;
 import utils.Node;
 import utils.Node.SensorState;
+import utils.NodeLocation;
 
 import org.json.*;
 
@@ -250,33 +253,32 @@ public class P2PNetwork {
 					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 				}
 				else{
-					this.send(new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode));
+					Node closeNeighbour = this.localNode.findClosestNode(newNode, this.neighborNodes);
+					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
+					returnMessage.setClosestNode(closeNeighbour);
+					this.send(returnMessage);
 				}
 				return;
 		case MSG_JSON:
 				System.out.println("Received \"MSG_JSON\"");
-			/*	//if final JSON, send it to the phone. if I am the phone, myip = phoneip. then pass it back to clientActivtiy
-				if((localNode.ip.equalsIgnoreCase(message.phoneIP))&(localNode.port==message.phonePort)) {
-					ClientActivity.getInstance().setJSONObjectToSendInstance(message.getJsonRoute());
-					return;
-				}
-*/
-
-
 				//if start node = myself,I am the device and  it is the final JSON, send it to the phone
 				if(message.getStartNodeIP().equalsIgnoreCase(localNode.ip)){
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
-
 				}
 				else{
-					message.setDestIP(this.neighborNodes.get(1).ip);  //setting as first neighbour, should change to nearest node
-					message.setDestPort(this.neighborNodes.get(1).port);
-
+					Node tempNode = new Node();
+					String destloc = message.getDestLoc();
+					String latLng[] = destloc.split(",");
+					double latLong[] = null;
+					latLong[0] = Double.parseDouble(latLng[0]);
+					latLong[1] = Double.parseDouble(latLng[1]);
+					NodeLocation tempLoc = new NodeLocation(latLong);
+					tempNode.myLocation = tempLoc;
+					Node closestNeighbor = localNode.findClosestNode(tempNode, neighborNodes);
+					message.setDestIP(closestNeighbor.ip); 
+					message.setDestPort(closestNeighbor.port);
 				}
-
-
-
 				//if destLoc is in my patrol area, add my location to json and send to start node
 				JSONObject newJSON = message.getJsonRoute();
 					//Add my location to the json Object if I'm safe, send it to my nearest neighbour

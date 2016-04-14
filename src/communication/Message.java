@@ -17,7 +17,8 @@ public class Message implements Serializable {
 	public String phoneIP;
 	public int phonePort;
 	int seqNum;
-	
+	Node closestNode = null; //ip of my neighbour which is closest to the sender
+
 	public enum messageKind{
 		GET_PARAM, 				// request parameters of the foreign node, send myself
 		GET_PARAM_RESPONSE,  		// response to getParam - send my parameters
@@ -113,6 +114,15 @@ public class Message implements Serializable {
 	public void setPhoneIP(String phoneIP) { this.phoneIP = phoneIP; }
 
 	public void setPhonePort(int phonePort) {this.phonePort = phonePort;}
+	
+	public Node getClosestNode() {
+		return closestNode;
+	}
+
+	public void setClosestNode(Node closestNode) {
+		this.closestNode = closestNode;
+	}
+
 
 	
 
