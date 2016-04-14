@@ -196,6 +196,7 @@ public class P2PNetwork {
 //			this.foundNodes.put(newNode.getName(), newNode);
 			// request to update patrol region
 //			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
+		
 			return;
 			
 		case REQ_UPDATED_PATROL:
