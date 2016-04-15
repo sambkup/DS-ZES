@@ -255,7 +255,7 @@ public class P2PNetwork {
 					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 				}
 				else{
-					Node closeNeighbour = this.localNode.findClosestNode(newNode, this.neighborNodes);
+					Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
 					System.out.println(closeNeighbour.ip);
 					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
 					returnMessage.setClosestNode(closeNeighbour);
