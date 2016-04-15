@@ -264,9 +264,9 @@ public class P2PNetwork {
 				return;
 		case MSG_JSON:
 				System.out.println("Received \"MSG_JSON\"");
-				//if start node = myself,I am the device and  it is the final JSON, send it to the phone
-				System.out.println(" start node IP "+message.startNodeIP);
-				if(message.getStartNodeIP().equalsIgnoreCase(localNode.ip)){
+				//if start node = myself, and sender is not phone(since source is not set, checking if route is null), I am the device and  it is the final JSON, send it to the phone
+				
+				if(message.getStartNodeIP().equalsIgnoreCase(localNode.ip)&&(message.jsonRoute!=null)){
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
 				}
@@ -296,12 +296,6 @@ public class P2PNetwork {
 
 				this.send(message);
 				return;
-			case MY_AREA:
-				System.out.println("Received \"MY_AREA\"");
-				//establish a permanent connection with it and wait for JSON
-				this.send(new Message(newNode.ip,newNode.port,messageKind.MSG_JSON, this.localNode));
-				return;
-
 			
 						
 		default:
