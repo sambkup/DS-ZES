@@ -71,7 +71,7 @@ public class P2PNetwork {
 		int maxIP = 256;
 		String testIP;
 		for (int i = 1; i<maxIP; i++){
-			if (Integer.toString(i).equals(chunks[3])){
+			if (Integer.toString(i).equals(chunks[3])){ 
 				continue;
 			}
 
@@ -188,6 +188,8 @@ public class P2PNetwork {
 		
 		Node newNode = message.getNode();
 	
+		System.out.println("new node's ip is "+newNode.ip);
+	
 		switch (message.kind) {
 		case GET_PARAM:
 			System.out.println("Recevied \"GET_PARAM\"");
@@ -196,9 +198,9 @@ public class P2PNetwork {
 			
 		case GET_PARAM_RESPONSE:
 			System.out.println("Recevied \"GET_PARAM_RESPONSE\"");
-//			this.foundNodes.put(newNode.getName(), newNode);
+			//this.foundNodes.put(newNode.getName(), newNode);
 			// request to update patrol region
-//			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
+			//this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
 		
 			return;
 			
@@ -254,6 +256,7 @@ public class P2PNetwork {
 				}
 				else{
 					Node closeNeighbour = this.localNode.findClosestNode(newNode, this.neighborNodes);
+					System.out.println(closeNeighbour.ip);
 					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
 					returnMessage.setClosestNode(closeNeighbour);
 					this.send(returnMessage);
@@ -262,6 +265,7 @@ public class P2PNetwork {
 		case MSG_JSON:
 				System.out.println("Received \"MSG_JSON\"");
 				//if start node = myself,I am the device and  it is the final JSON, send it to the phone
+				System.out.println(" start node IP "+message.startNodeIP);
 				if(message.getStartNodeIP().equalsIgnoreCase(localNode.ip)){
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
@@ -330,7 +334,7 @@ public class P2PNetwork {
 			while (true) {
 				Socket clientSocket = listenSocket.accept();				
 				new Connection(clientSocket, this);
-				System.out.println("Server received a new connection: # " + counter);
+				System.out.println("Server received a new connection: # " + counter + " ip: "+clientSocket.getRemoteSocketAddress());
 				counter++;
 			}
 		} catch (IOException e) {
@@ -411,13 +415,16 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
+				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
+				System.out.println(message.toString());
 				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 
 		} catch (EOFException e) {
 			System.out.println("Server EOF:" + e.getMessage());
+			
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 

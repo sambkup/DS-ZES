@@ -32,10 +32,11 @@ public class SensorNode2 {
 		// --------------------------------
 		// initialize - get necessary parameter inputs
 //		int port = Integer.parseInt(args[0]);
-		int port = 4001;
+		int port = 4002;
 		
 
 		String IP = findMyIPaddr(); // localhost
+		IP = "172.29.92.26"; //hardcoding it to get messags from android
 		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
 		double[] location = {40.443077,-79.942227};
 		

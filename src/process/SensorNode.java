@@ -3,7 +3,10 @@ package process;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
@@ -28,7 +31,7 @@ public class SensorNode {
 	static NodeLocation node_loc;
 	static Node myNode;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnknownHostException, IOException {
 		
 		// --------------------------------
 		// initialize - get necessary parameter inputs
@@ -36,6 +39,8 @@ public class SensorNode {
 		
 
 		String IP = findMyIPaddr();
+		IP  = "172.29.92.26"; //hardcoding it to get messags from android
+		
 		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
 		double[] location = {40.443082,-79.942418}; // a second spot on campus
 		
@@ -73,12 +78,14 @@ public class SensorNode {
 		InetAddress x = null;
 		try {
 			x = InetAddress.getLocalHost();
+			
+		
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 		return x.getHostAddress();
+		
 	}
-
 
 
 	
