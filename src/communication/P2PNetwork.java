@@ -271,15 +271,13 @@ public class P2PNetwork {
 					message.setDestPort(message.phonePort);
 				}
 				else{
-					Node tempNode = new Node();
+					
 					String destloc = message.getDestLoc();
 					String latLng[] = destloc.split(",");
 					double latLong[] = null;
 					latLong[0] = Double.parseDouble(latLng[0]);
 					latLong[1] = Double.parseDouble(latLng[1]);
-					NodeLocation tempLoc = new NodeLocation(latLong);
-					tempNode.myLocation = tempLoc;
-					Node closestNeighbor = localNode.findClosestNode(tempNode, neighborNodes);
+					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
 					message.setDestIP(closestNeighbor.ip); 
 					message.setDestPort(closestNeighbor.port);
 				}

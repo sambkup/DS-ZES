@@ -31,6 +31,19 @@ public class NodeLocation implements Serializable{
 	public String toString() {
 		return String.format("(%f,%f)", location[0],location[1]);
 	}
+	
+	/**
+	 * @param loc1 
+	 * @param loc2
+	 * @return distance between the two coordinates
+	 */
+	public double findDistance(double[] loc){
+		double deltaLat = loc[0]-this.location[0];
+		double deltaLon = loc[1]-this.location[1];
+		double dist = Math.pow(deltaLat,2)+Math.pow(deltaLon,2);
+		dist = Math.pow(dist, 0.5);	
+		return dist;
+	}
 
 
 

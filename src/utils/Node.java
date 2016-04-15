@@ -6,50 +6,6 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
-/**
- * @author jayasudha
- *
- */
 public class Node implements Serializable {
 
 	public enum SensorState {
@@ -101,34 +57,18 @@ public class Node implements Serializable {
 		testNode.myPatrolArea = myPatrolArea.splitPatrolArea(testNode.myLocation);
 		return testNode;
 	}
-	/**
-	 * @param testNode, otherNode
-	 *            
-	 * @return Given 2 nodes, return the distance between two
-	 */
-
-	
-	public double distance(Node testNode, Node otherNode) {
-		double testLat = testNode.myLocation.getLocation()[0];
-		double testLon = testNode.myLocation.getLocation()[1];
-		double lat = otherNode.myLocation.getLocation()[0];
-		double lon = otherNode.myLocation.getLocation()[1];
-		double dist = Math.pow((Math.pow((lat - testLat), 2) + Math.pow((lon - testLat), 2)), 1 / 2); //euclidean distance
-		return dist;
-
-	}
 
 	/**
 	 * @param testNode,
 	 *            neighborNodes
 	 * @return Given a node, determine the closest node from my neighbors and return the node
 	 */
-	public Node findClosestNode(Node testNode, HashMap<String, Node> neighborNodes) {
+	public Node findClosestNode(double[] latLong, HashMap<String, Node> neighborNodes) {
 		Node returnNode = null;
 		double minDistance = 0;
 		for (String key : neighborNodes.keySet()) {
 			Node neighbor = neighborNodes.get(key);
-			double dist = this.distance(this, neighbor);
+			double dist = neighbor.myLocation.findDistance(latLong);
 			if (minDistance == 0) {
 				minDistance = dist;
 				returnNode = neighbor;
