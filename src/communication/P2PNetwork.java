@@ -1,8 +1,11 @@
 package communication;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -55,14 +58,45 @@ public class P2PNetwork {
 		};
 		server.start();
 		
+		Thread reader = new Thread() {
+			public void run() {
+				while (true) {
+					try {
+						sleep(5000);
+						readfiles("state.txt");
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+					}
+				}
+			}
+		};
+		reader.start();
+		
 		/* bootstrap */
 		System.out.println("Starting bootstrapping...");
 		if (!findFirstNodeByIP()){
 			System.out.println("I am the first node");
 		}
-		
+		 
 	}
-	
+	public void readfiles(String name) throws IOException{
+		File file = new File(name);
+		String line;
+		FileReader fr = new FileReader(file);
+		BufferedReader br = new BufferedReader(fr);
+		line = br.readLine();
+		if(line.equalsIgnoreCase("safe")){
+			this.localNode.setSafe();
+			
+		}
+		else if(line.equalsIgnoreCase("danger")){
+			this.localNode.setUnsafe();
+		}
+		fr.close();
+		br.close();
+		return;			
+	}
+
 	private boolean findFirstNodeByIP(){
 		String myIP = this.localNode.ip;
 		String delims = "[.]";
@@ -342,6 +376,7 @@ public class P2PNetwork {
 		}
 
 	}
+	
 	
 	
 	@SuppressWarnings("unused")
