@@ -17,11 +17,9 @@ public class Node implements Serializable {
 	public String ip = null;
 	public int port = 0;
 	public String address = null;
-	NodePatrolArea myPatrolArea;
+	public NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
-	// public String state = "SAFE";
-
 	SensorState state;
 
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation, int port, String ip) {
