@@ -100,9 +100,9 @@ public class P2PNetwork {
 		String delims = "[.]";
 		String[] chunks = myIP.split(delims);
 
-		int maxIP = 256;
+		int maxIP = 150;
 		String testIP;
-		for (int i = 1; i<maxIP; i++){
+		for (int i = 100; i<maxIP; i++){
 			if (Integer.toString(i).equals(chunks[3])){ 
 				continue;
 			}
