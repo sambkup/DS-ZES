@@ -316,6 +316,7 @@ public class P2PNetwork {
 				
 				/*if my area, send to phone else to closest neighbour*/
 				if(this.localNode.myPatrolArea.inMyArea(destLoc)){
+					System.out.println("I am the last node in the chain");
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
 				}
@@ -324,7 +325,8 @@ public class P2PNetwork {
 					message.setDestIP(closestNeighbor.ip); 
 					message.setDestPort(closestNeighbor.port);	
 				}
-				this.send(message);		
+				this.send(message);	
+				return;
 		default:
 			break;
 		}
