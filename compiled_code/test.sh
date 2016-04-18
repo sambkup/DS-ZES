@@ -12,7 +12,7 @@ if [ "$HOSTNAME" != "E2-kupfer" ]; then
     cat /sys/class/gpio/gpio14/value;
 fi
 
-FILENAME="DeployedNodeV0_01.jar"
+FILENAME="DeployedNodeV0_02.jar"
 
 # set the nodes to have reserved IPs
 case $HOSTNAME in
