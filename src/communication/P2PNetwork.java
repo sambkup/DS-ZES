@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import com.google.gson.Gson;
-import com.sun.xml.internal.ws.util.xml.NodeListIterator;
-
 import communication.Message.messageKind;
 import utils.Node;
 import utils.Node.SensorState;
@@ -232,6 +230,8 @@ public class P2PNetwork {
 			if (!localNode.inMyArea(newNode)){
 				// TODO: find which node the newNode should ask next
 				newNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+				
+				System.out.printf("Next closes node is %s\n", newNode.toString());
 				
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, newNode));
 				return;
