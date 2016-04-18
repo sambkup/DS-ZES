@@ -301,6 +301,7 @@ public class P2PNetwork {
 					newJSON = this.localNode.enterJSON(message.getJsonRoute());
 				} catch (Exception ex) {
 					System.out.println("error in entering my location to JSON");
+					ex.printStackTrace();
 				}
 			}
 			message.setJsonRoute(newJSON);
@@ -436,8 +437,8 @@ class Connection extends Thread {
 				String json = in.readUTF();
 				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
-//				System.out.println(message.toString());
-//				System.out.println("calling receive message function");
+				System.out.println(message.toString());
+				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 

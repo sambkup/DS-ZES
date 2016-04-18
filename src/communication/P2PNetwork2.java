@@ -236,10 +236,10 @@ public class P2PNetwork2 {
 			Message jsonRequest = new Message(newNode.ip,newNode.port,messageKind.MSG_JSON, this.localNode);
 			jsonRequest.setDestLoc("8,8");
 			jsonRequest.setStartNodeIP(newNode.ip);
-			jsonRequest.setJsonRoute(null);
+			jsonRequest.setJsonRoute(new JSONObject());
 			jsonRequest.setKind(messageKind.MSG_JSON);
 			send(jsonRequest);
-			break;
+			return;
 		case NOT_MY_AREA:
 			System.out.println("Received \"NOT_MY_AREA\"");
 			Node newDest = message.getClosestNode();
@@ -247,7 +247,7 @@ public class P2PNetwork2 {
 			message.setDestIP(newDest.ip);
 			message.setDestPort(newDest.port);
 			send(message);
-			break;
+			return;
 		default:
 			break;
 		}

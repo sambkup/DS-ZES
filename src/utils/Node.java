@@ -101,7 +101,7 @@ public class Node implements Serializable {
 
 	public JSONObject enterJSON(JSONObject route) throws JSONException {
 		int count = route.length();
-		count = count + 1;
+		count++;
 		route.put(String.valueOf(count), myLocation);
 		return route;
 	}
