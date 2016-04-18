@@ -231,7 +231,7 @@ public class P2PNetwork {
 				// TODO: find which node the newNode should ask next
 				newNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
 				
-				System.out.printf("Next closes node is %s\n", newNode.toString());
+				System.out.printf("Next closest node is %s\n", newNode.toString());
 				
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, newNode));
 				return;
