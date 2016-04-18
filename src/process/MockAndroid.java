@@ -40,7 +40,7 @@ public class MockAndroid {
 		IP  = "192.168.2.118"; //hardcoding it to get messags from android
 		
 		double[] range = {0,0,0,0};
-		double[] location = {40.4430775,-79.9423925}; // node 5
+		double[] location = {2,2}; // node 5
 		
 
 		// --------------------------------

@@ -308,7 +308,7 @@ public class P2PNetwork {
 				/*get destination of user*/
 				String destloc = message.getDestLoc();
 				String latLng[] = destloc.split(",");
-				double latLong[] = null;
+				double latLong[] = new double[2];
 				latLong[0] = Double.parseDouble(latLng[0]);
 				latLong[1] = Double.parseDouble(latLng[1]);
 				NodeLocation destLoc = new NodeLocation(latLong);

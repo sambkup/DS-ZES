@@ -71,9 +71,9 @@ public class P2PNetwork2 {
 		String delims = "[.]";
 		String[] chunks = myIP.split(delims);
 
-		int maxIP = 256;
+		int maxIP = 150;
 		String testIP;
-		for (int i = 1; i<maxIP; i++){
+		for (int i = 100; i<maxIP; i++){
 			if (Integer.toString(i).equals(chunks[3])){
 				continue;
 			}
@@ -91,7 +91,7 @@ public class P2PNetwork2 {
 				message.setJsonRoute(null);
 
 				//destLocation
-				message.setDestLoc("40.4429678,-79.9422275"); // node 16
+				message.setDestLoc("8,8"); // node 16
 
 				message.setPhoneIP(localNode.ip);
 				message.setPhonePort(localNode.port);
@@ -234,7 +234,7 @@ public class P2PNetwork2 {
 		case MY_AREA:
 			System.out.println("Received \"MY_AREA\"");
 			Message jsonRequest = new Message(newNode.ip,newNode.port,messageKind.MSG_JSON, this.localNode);
-			jsonRequest.setDestLoc("40.4429678,-79.9422275");
+			jsonRequest.setDestLoc("8,8");
 			jsonRequest.setStartNodeIP(newNode.ip);
 			jsonRequest.setJsonRoute(null);
 			jsonRequest.setKind(messageKind.MSG_JSON);
