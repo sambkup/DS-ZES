@@ -36,6 +36,7 @@ public class NodePatrolArea implements Serializable{
 		// check if there are matching coordinates
 		for (double me:this.range){
 			for(double test:testPatrolArea.range){
+				System.out.println("Compare: "+me +"=="+test);
 				if(me==test){
 					return true;
 				}
