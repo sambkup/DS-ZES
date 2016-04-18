@@ -229,11 +229,11 @@ public class P2PNetwork {
 			// check if there is area overlap
 			if (!localNode.inMyArea(newNode)){
 				// TODO: find which node the newNode should ask next
-				newNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+				Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
 				
 				System.out.printf("Next closest node is %s\n", newNode.toString());
 				
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, newNode));
+				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
 				return;
 			}
 			
