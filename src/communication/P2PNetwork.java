@@ -439,14 +439,9 @@ public class P2PNetwork {
 		System.out.println("Printing Neighbor Nodes----------");
 		
 		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
-		    System.out.println(entry.getKey()+":\t"+entry.getValue());
+		    System.out.println(entry.getValue().toString());
 		}
 
-//		int numFoundNodes = this.foundNodes.size();
-//		for (int i = 0; i<numFoundNodes; i++){
-////			System.out.println(" "+i+": "+this.foundNodes.get(i).toString());
-//			System.out.println(" "+i+": "+this.foundNodes..get(i).toString());
-//		}
 		System.out.println("------------------------------");
 	}
 	
@@ -479,7 +474,7 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
-				System.out.println(json);
+//				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
 //				System.out.println(message.toString());
 //				System.out.println("calling receive message function");

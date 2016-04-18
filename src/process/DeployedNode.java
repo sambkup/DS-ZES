@@ -53,6 +53,9 @@ public class DeployedNode {
 		initial_patrol_area = new NodePatrolArea(range);
 		node_loc = new NodeLocation(location);
 		myNode = new Node(initial_patrol_area,region,node_loc,port,IP);
+	    System.out.println("Starting DeployedNode.jar");
+	    System.out.println("MyNode: "+myNode.toString());
+
 		p2p = new P2PNetwork(myNode);
 
 
