@@ -124,7 +124,7 @@ public class SensorNode2 {
 		if (result == -1) {
 			System.exit(0);
 		}  else if (options[result].equals("Print Nodes")) {
-			p2p.printFoundNodes();
+			p2p.printNeighborNodes();
 		} 
 
 	}

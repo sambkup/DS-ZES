@@ -220,7 +220,7 @@ public class P2PNetwork {
 		
 		Node newNode = message.getNode();
 	
-		System.out.println("new node's ip is "+newNode.ip);
+//		System.out.println("new node's ip is "+newNode.ip);
 	
 		switch (message.kind) {
 			
@@ -294,6 +294,7 @@ public class P2PNetwork {
 			
 			// 1. check if newnode is a neighbor
 			if (this.localNode.isNeighbor(message.getNewNode())){
+				System.out.println("NewNode is not a neighbor");
 				this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode());
 			}
 
@@ -301,9 +302,11 @@ public class P2PNetwork {
 			// 2. check if SplitNode is still a neighbor
 			if (!this.localNode.isNeighbor(message.getSplitNode())){
 				// not a neighbor - drop it
+				System.out.println("SplitNode is no longer a neighbor");
 				this.neighborNodes.remove(message.getSplitNode().getName());
 			} else {
 				// is a neighbor, update it
+				System.out.println("SplitNode is still a neighbor");
 				this.neighborNodes.put(message.getSplitNode().getName(),message.getSplitNode());
 			}
 			return;
@@ -432,7 +435,7 @@ public class P2PNetwork {
 		return null;
 	}
 
-	public void printFoundNodes(){
+	public void printNeighborNodes(){
 		System.out.println("Printing Neighbor Nodes----------");
 		
 		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
@@ -478,8 +481,8 @@ class Connection extends Thread {
 				String json = in.readUTF();
 				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
-				System.out.println(message.toString());
-				System.out.println("calling receive message function");
+//				System.out.println(message.toString());
+//				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 

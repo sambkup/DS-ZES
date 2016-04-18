@@ -71,7 +71,7 @@ public class DeployedNode {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					p2p.printFoundNodes();
+					p2p.printNeighborNodes();
 				}
 			}
 		};
