@@ -19,7 +19,7 @@ public class Node implements Serializable {
 	public NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
-	SensorState state;
+	public SensorState state;
 
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation, int port, String ip) {
 
@@ -29,10 +29,6 @@ public class Node implements Serializable {
 		this.port = port;
 		this.ip = ip;
 		this.state = SensorState.SAFE;
-	}
-
-	public Node() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public Node clone() {

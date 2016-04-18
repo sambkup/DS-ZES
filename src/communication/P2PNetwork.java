@@ -294,8 +294,8 @@ public class P2PNetwork {
 			
 			// 1. check if newnode is a neighbor
 			if (this.localNode.isNeighbor(message.getNewNode())){
-				System.out.println("NewNode is a neighbor");
-				this.neighborNodes.put(message.getNewNode().clone().getName(), message.getNewNode().clone());
+				System.out.println("NewNode is a neighbor: " + message.getNewNode().getName() + "" );
+				this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode().clone());
 				this.printNeighborNodes();
 			}
 
