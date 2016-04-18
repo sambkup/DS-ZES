@@ -1,18 +1,5 @@
 package process;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import communication.P2PNetwork;
 import utils.Node;
 import utils.NodeLocation;
