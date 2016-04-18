@@ -231,9 +231,12 @@ public class P2PNetwork2 {
 
 			/* if my_area, set the destloc, startnodeip, send out the request
 			 * else, send req_start to the the closestnode*/
+			return;
 		case MY_AREA:
 			System.out.println("Received \"MY_AREA\"");
 			Message jsonRequest = new Message(newNode.ip,newNode.port,messageKind.MSG_JSON, this.localNode);
+			jsonRequest.setPhoneIP(this.localNode.ip);
+			jsonRequest.setPhonePort(this.localNode.port);
 			jsonRequest.setDestLoc("8,8");
 			jsonRequest.setStartNodeIP(newNode.ip);
 			jsonRequest.setJsonRoute(new JSONObject());
