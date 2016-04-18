@@ -225,26 +225,16 @@ public class P2PNetwork {
 		System.out.println("new node's ip is "+newNode.ip);
 	
 		switch (message.kind) {
-		case GET_PARAM:
-			System.out.println("Recevied \"GET_PARAM\"");
-			this.send(new Message(newNode.ip,newNode.port,messageKind.GET_PARAM_RESPONSE, this.localNode));
-			return;
-			
-		case GET_PARAM_RESPONSE:
-			System.out.println("Recevied \"GET_PARAM_RESPONSE\"");
-			//this.foundNodes.put(newNode.getName(), newNode);
-			// request to update patrol region
-			//this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
-		
-			return;
 			
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
 			// check if there is area overlap
 			if (!localNode.inMyArea(newNode)){
-				// node not in my region
 				// TODO: find which node the newNode should ask next
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, this.localNode));
+				newNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+				
+				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, newNode));
+				return;
 			}
 			
 			else{
