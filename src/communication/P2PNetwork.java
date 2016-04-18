@@ -230,9 +230,7 @@ public class P2PNetwork {
 			if (!localNode.inMyArea(newNode)){
 				// TODO: find which node the newNode should ask next
 				Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
-				
 				System.out.printf("Next closest node is %s\n", nextNode.toString());
-				
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
 				return;
 			}
@@ -251,7 +249,7 @@ public class P2PNetwork {
 			
 		case UPDATE_PATROL_NACK:
 			System.out.println("Recevied \"UPDATE_PATROL_NACK\"");
-			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, newNode));
+			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
 			return;
 		case UPDATE_PATROL_ACK:
 			System.out.println("Recevied \"UPDATE_PATROL_ACK\"");
@@ -274,7 +272,7 @@ public class P2PNetwork {
 		case REQ_START:
 				System.out.println("Received \"REQ_START\"");
 				/* check if myloc is within my patrol area */
-				System.out.println(message.toString());
+//				System.out.println(message.toString());
 				if(this.localNode.inMyArea(newNode))	{
 					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 				}
