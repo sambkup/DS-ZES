@@ -293,9 +293,10 @@ public class P2PNetwork {
 			System.out.println("Recevied \"NEIGHBOR_UPDATE\"");
 			
 			// 1. check if newnode is a neighbor
-			if (!this.localNode.isNeighbor(message.getNewNode())){
-				System.out.println("NewNode is not a neighbor");
-				this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode());
+			if (this.localNode.isNeighbor(message.getNewNode())){
+				System.out.println("NewNode is a neighbor");
+				this.neighborNodes.put(message.getNewNode().clone().getName(), message.getNewNode().clone());
+				this.printNeighborNodes();
 			}
 
 			
