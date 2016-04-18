@@ -171,49 +171,7 @@ public class P2PNetwork2 {
 		Node newNode = message.getNode();
 		
 		switch (message.kind) {
-		case GET_PARAM:
-			System.out.println("Recevied \"GET_PARAM\"");
-			this.send(new Message(newNode.ip,newNode.port,messageKind.GET_PARAM_RESPONSE, this.localNode));
-			return;
 			
-		case GET_PARAM_RESPONSE:
-			System.out.println("Recevied \"GET_PARAM_RESPONSE\"");
-			this.foundNodes.put(newNode.getName(), newNode);
-			// request to update patrol region
-			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
-			return;
-			
-		case REQ_UPDATED_PATROL:
-			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
-			if (!localNode.inMyArea(newNode)){
-				// node not in my region
-				// TODO: find which node the newNode should ask next
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, this.localNode));
-			}
-			else{
-				// send newNode's location
-
-				/* phone not splitting*/
-				//newNode = localNode.splitPatrolArea(newNode);
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode));
-
-				// store new Node:
-				this.foundNodes.put(newNode.getName(), newNode);
-				
-				// send my updated location
-				this.send(new Message(newNode.ip,newNode.port,messageKind.SEND_UPDATED_PARAM, this.localNode));
-			}
-			return;
-
-		case SEND_UPDATED_PARAM:
-			this.foundNodes.put(newNode.getName(), newNode);
-			return;
-			
-		case SEND_PARAM:
-			System.out.println("Recevied \"SEND_PARAM\"");
-			this.foundNodes.put(newNode.getName(), newNode);
-			return;
-
 		case REQ_START:
 			System.out.println("Received \"REQ_START\"");
 
@@ -272,7 +230,7 @@ public class P2PNetwork2 {
 	private void listen_server() {
 
 
-		System.out.println("Starting MessagePasser server with address = " + this.localNode.address);
+		System.out.println("Starting MessagePasser server with address = " + this.localNode.getName());
 		int counter = 0;
 		ServerSocket listenSocket = null;
 		try {

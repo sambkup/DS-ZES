@@ -154,7 +154,7 @@ public class P2PNetwork {
 				// if a socket successfully opened
 				s.close();
 				System.out.println(testIP+":"+port + " - Found first node");	
-				Message message = new Message(testIP, port,messageKind.GET_PARAM,this.localNode);
+				Message message = new Message(testIP, port,messageKind.REQ_UPDATED_PATROL,this.localNode);
 				send(message);	
 				return true;
 			} catch (UnknownHostException e) {
@@ -226,7 +226,7 @@ public class P2PNetwork {
 			
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
-			// check if there is area overlap
+			// 1. Check if I can split, if not, send next closest node
 			if (!localNode.inMyArea(newNode)){
 				// TODO: find which node the newNode should ask next
 				Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
@@ -235,16 +235,35 @@ public class P2PNetwork {
 				return;
 			}
 			
-			else{
-				// update the newNode's patrol area
-				newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone
-				// tell it it's new patrol area
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode));
-				// store the new Node locally:
-				this.neighborNodes.put(newNode.getName(), newNode);
-				// send my updated location
-				this.send(new Message(newNode.ip,newNode.port,messageKind.SEND_UPDATED_PARAM, this.localNode));
+			// 2. Split the patrol area, send update to NewNode
+			
+			newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone			
+			Message newMessage = new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode);
+			newMessage.setNewNode(newNode);
+			newMessage.setSplitNode(this.localNode);
+			newMessage.setNeighborNodes(this.neighborNodes);
+			this.send(newMessage);
+			
+			// 3. send NEIGHBOR_UPDATE to all my neighbors
+			newMessage.setKind(messageKind.NEIGHBOR_UPDATE);
+			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+				// need to clone the message here just in case newMessage updates before sending
+				newMessage.setDestIP(entry.getValue().ip);
+				newMessage.setDestPort(entry.getValue().port);
+				this.send(newMessage.clone());
 			}
+			
+			// 4. check if any of my neighbors are still neighbors
+			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+				// need to clone the message here just in case newMessage updates before sending
+				if (!this.localNode.isNeighbor(entry.getValue())){
+					// not a neighbor - drop it
+					this.neighborNodes.remove(entry.getKey());
+				}
+			}
+			// 5. Add NewNode to my neighbors
+			this.neighborNodes.put(newNode.getName(), newNode.clone());
+			
 			return;
 			
 		case UPDATE_PATROL_NACK:
@@ -253,22 +272,43 @@ public class P2PNetwork {
 			return;
 		case UPDATE_PATROL_ACK:
 			System.out.println("Recevied \"UPDATE_PATROL_ACK\"");
-			// Update my node's information
-			this.localNode = newNode;
+			// 1. Update my node's information
+			this.localNode = message.getNewNode();
+			
+			// 2. Check if any of the neighbors are mine
+			for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
+				// need to clone the message here just in case newMessage updates before sending
+				if (this.localNode.isNeighbor(entry.getValue())){
+					// not a neighbor - drop it
+					this.neighborNodes.put(entry.getKey(), entry.getValue());
+				}
+			}
+			
+			// 3. Add SplitNode to my neighbors
+			this.neighborNodes.put(message.getSplitNode().getName(), message.getSplitNode().clone());
+			
+			
 			return;
-					
-		case SEND_UPDATED_PARAM:
-			System.out.println("Recevied \"SEND_UPDATED_PARAM\"");
-			synchronized(this.neighborNodes){
-				this.neighborNodes.put(newNode.getName(), newNode);
+		case NEIGHBOR_UPDATE:
+			System.out.println("Recevied \"NEIGHBOR_UPDATE\"");
+			
+			// 1. check if newnode is a neighbor
+			if (this.localNode.isNeighbor(message.getNewNode())){
+				this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode());
+			}
+
+			
+			// 2. check if SplitNode is still a neighbor
+			if (!this.localNode.isNeighbor(message.getSplitNode())){
+				// not a neighbor - drop it
+				this.neighborNodes.remove(message.getSplitNode().getName());
+			} else {
+				// is a neighbor, update it
+				this.neighborNodes.put(message.getSplitNode().getName(),message.getSplitNode());
 			}
 			return;
-			
-		case SEND_PARAM:
-			System.out.println("Recevied \"SEND_PARAM\"");
-//			this.foundNodes.put(newNode.getName(), newNode);
-			return;
-			
+					
+					
 		case REQ_START:
 				System.out.println("Received \"REQ_START\"");
 				/* check if myloc is within my patrol area */
@@ -346,7 +386,7 @@ public class P2PNetwork {
 	}
 
 	private void listen_server() {
-		System.out.println("Starting MessagePasser server with address = " + this.localNode.address);
+		System.out.println("Starting MessagePasser server with address = " + this.localNode.getName());
 		int counter = 0;
 		ServerSocket listenSocket = null;
 		try {
@@ -394,7 +434,6 @@ public class P2PNetwork {
 
 	public void printFoundNodes(){
 		System.out.println("Printing Neighbor Nodes----------");
-		System.out.println(this.localNode.getName()+":\t"+this.localNode.toString());
 		
 		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
 		    System.out.println(entry.getKey()+":\t"+entry.getValue());

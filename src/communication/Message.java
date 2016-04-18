@@ -1,6 +1,8 @@
 package communication;
 
 import java.io.Serializable;
+import java.util.HashMap;
+
 import org.json.JSONObject;
 
 import utils.Node;
@@ -19,14 +21,20 @@ public class Message implements Serializable {
 	int seqNum;
 	Node closestNode = null; //ip of my neighbour which is closest to the sender
 
+
+	private HashMap<String, Node> neighborNodes;
+	private Node SplitNode;
+	private Node NewNode;
+	
+	
+
+
 	public enum messageKind{
-		GET_PARAM, 				// request parameters of the foreign node, send myself
-		GET_PARAM_RESPONSE,  		// response to getParam - send my parameters
-		SEND_PARAM, 			// send my parameters
-		SEND_UPDATED_PARAM,		// send my updated parameters (assume my parameters are already stored)
-		REQ_UPDATED_PATROL,		// request node to divide region with me.
-		UPDATE_PATROL_NACK,	// - NACK if not in my region & NODE = next node to ask
-		UPDATE_PATROL_ACK,	// - ACK if my region is split & NODE = what I should be (will also receive an updateParam message)
+		REQ_UPDATED_PATROL,		
+		UPDATE_PATROL_NACK,	
+		UPDATE_PATROL_ACK,	
+		NEIGHBOR_UPDATE,
+		
 		REQ_START, //message sent from phone to nodes to get a start node
 		MY_AREA, //response sent from node to phone saying if it's in the node's patrol area
 		NOT_MY_AREA, //response sent from node to phone saying the user is not in user's patrol area
@@ -42,6 +50,49 @@ public class Message implements Serializable {
 		this.seqNum = -1;
 	}
 
+
+
+
+	public void print() {
+		System.out.println("------------------------------");
+		System.out.println("Message To: " + this.destIP+":"+this.destPort);
+		System.out.println("Message Kind: " + this.kind);
+		System.out.println("Message Data: " + this.node.toString());
+		System.out.println("Message SeqNum: " + this.seqNum);
+		System.out.println("------------------------------");
+	}
+
+	@SuppressWarnings("unchecked")
+	public Message clone() {
+		//TODO: update this
+		Message clone = new Message(destIP, destPort, kind, node.clone());
+		clone.seqNum = seqNum;
+		// TODO: skipped some parameters
+//		public String destLoc; //lat,lng, to store the destination of user
+//		public String startNodeIP;
+//		public JSONObject jsonRoute;
+//		public String phoneIP;
+//		public int phonePort;
+//		Node closestNode = null; //ip of my neighbour which is closest to the sender
+
+
+		//TODO: check this supressed warning
+		clone.neighborNodes = (HashMap<String, Node>) this.neighborNodes.clone();
+		clone.SplitNode = this.SplitNode.clone();
+		clone.NewNode = this.SplitNode.clone();
+
+		return clone;
+	}
+
+	public String toString() {
+		return String.format("Message To: %s:%d, Kind: %s, Data: %s, SeqNum: %d", this.destIP, this.destPort, this.kind,
+				this.node.toString(), this.seqNum);
+	}
+	
+	
+	/*** Getters and Setters ***/
+	
+	
 	public String getDestIP() {
 		return destIP;
 	}
@@ -122,27 +173,48 @@ public class Message implements Serializable {
 	public void setClosestNode(Node closestNode) {
 		this.closestNode = closestNode;
 	}
-
-
 	
-
-	public void print() {
-		System.out.println("------------------------------");
-		System.out.println("Message To: " + this.destIP+":"+this.destPort);
-		System.out.println("Message Kind: " + this.kind);
-		System.out.println("Message Data: " + this.node.toString());
-		System.out.println("Message SeqNum: " + this.seqNum);
-		System.out.println("------------------------------");
+	
+	
+	/**
+	 * @return the neighborNodes
+	 */
+	public HashMap<String, Node> getNeighborNodes() {
+		return neighborNodes;
 	}
 
-	public Message clone() {
-		Message clone = new Message(destIP, destPort, kind, node);
-		clone.seqNum = seqNum;
-		return clone;
+	/**
+	 * @param neighborNodes the neighborNodes to set
+	 */
+	public void setNeighborNodes(HashMap<String, Node> neighborNodes) {
+		this.neighborNodes = neighborNodes;
 	}
 
-	public String toString() {
-		return String.format("Message To: %s:%d, Kind: %s, Data: %s, SeqNum: %d", this.destIP, this.destPort, this.kind,
-				this.node.toString(), this.seqNum);
+	/**
+	 * @return the splitNode
+	 */
+	public Node getSplitNode() {
+		return SplitNode;
+	}
+
+	/**
+	 * @param splitNode the splitNode to set
+	 */
+	public void setSplitNode(Node splitNode) {
+		SplitNode = splitNode;
+	}
+
+	/**
+	 * @return the newNode
+	 */
+	public Node getNewNode() {
+		return NewNode;
+	}
+
+	/**
+	 * @param newNode the newNode to set
+	 */
+	public void setNewNode(Node newNode) {
+		NewNode = newNode;
 	}
 }

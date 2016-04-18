@@ -16,7 +16,6 @@ public class Node implements Serializable {
 
 	public String ip = null;
 	public int port = 0;
-	public String address = null;
 	public NodePatrolArea myPatrolArea;
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
@@ -30,7 +29,6 @@ public class Node implements Serializable {
 		this.port = port;
 		this.ip = ip;
 		this.state = SensorState.SAFE;
-		this.address = String.format("/%s:%d", this.ip, this.port);
 	}
 
 	public Node() {
@@ -38,8 +36,10 @@ public class Node implements Serializable {
 	}
 
 	public Node clone() {
-		return new Node(this.myPatrolArea.clone(), this.p2pPatrolArea.clone(), this.myLocation.clone(), this.port,
+		Node clone = new Node(this.myPatrolArea.clone(), this.p2pPatrolArea.clone(), this.myLocation.clone(), this.port,
 				this.ip);
+		clone.state = this.state;
+		return clone;
 
 	}
 
