@@ -231,7 +231,7 @@ public class P2PNetwork {
 				// TODO: find which node the newNode should ask next
 				Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
 				
-				System.out.printf("Next closest node is %s\n", newNode.toString());
+				System.out.printf("Next closest node is %s\n", nextNode.toString());
 				
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
 				return;
@@ -438,8 +438,8 @@ class Connection extends Thread {
 				String json = in.readUTF();
 				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
-				System.out.println(message.toString());
-				System.out.println("calling receive message function");
+//				System.out.println(message.toString());
+//				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 
