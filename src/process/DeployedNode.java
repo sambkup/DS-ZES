@@ -41,7 +41,8 @@ public class DeployedNode {
 
 		// --------------------------------
 		// initialize - Hard-coded parameters
-		double[] range = {40.44294,-79.94242,40.44316,-79.9422};
+//		double[] range = {40.44294,-79.94242,40.44316,-79.9422};
+		double[] range = {0,0,10,10};
 		int port = 4001; 
 
 
