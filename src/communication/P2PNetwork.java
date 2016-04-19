@@ -236,34 +236,46 @@ public class P2PNetwork {
 			}
 			
 			// 2. Split the patrol area, send update to NewNode
-			
-			newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone			
-			Message newMessage = new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode);
-			newMessage.setNewNode(newNode);
-			System.out.println("NewNode set to: "+newNode.getName());
-			newMessage.setSplitNode(this.localNode);
-			newMessage.setNeighborNodes(this.neighborNodes);
-			this.send(newMessage);
+			Message newMessage = null;
+			synchronized(this.neighborNodes){
+				newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone			
+				newMessage = new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode);
+				newMessage.setNewNode(newNode);
+				System.out.println("NewNode set to: "+newNode.getName());
+				newMessage.setSplitNode(this.localNode);
+				newMessage.setNeighborNodes(this.neighborNodes);
+				this.send(newMessage);
+			}
+
 			
 			// 3. send NEIGHBOR_UPDATE to all my neighbors
 			newMessage.setKind(messageKind.NEIGHBOR_UPDATE);
-			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
-				// need to clone the message here just in case newMessage updates before sending
-				newMessage.setDestIP(entry.getValue().ip);
-				newMessage.setDestPort(entry.getValue().port);
-				this.send(newMessage.clone());
+			synchronized(this.neighborNodes){
+				for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+					// need to clone the message here just in case newMessage updates before sending
+					newMessage.setDestIP(entry.getValue().ip);
+					newMessage.setDestPort(entry.getValue().port);
+					this.send(newMessage.clone());
+				}
 			}
+
+
 			
 			// 4. check if any of my neighbors are still neighbors
-			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
-				// need to clone the message here just in case newMessage updates before sending
-				if (!this.localNode.isNeighbor(entry.getValue())){
-					// not a neighbor - drop it
-					this.neighborNodes.remove(entry.getKey());
+			synchronized(this.neighborNodes){
+				for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+					// need to clone the message here just in case newMessage updates before sending
+					if (!this.localNode.isNeighbor(entry.getValue())){
+						// not a neighbor - drop it
+						this.neighborNodes.remove(entry.getKey());
+					}
 				}
 			}
 			// 5. Add NewNode to my neighbors
-			this.neighborNodes.put(newNode.getName(), newNode.clone());
+			synchronized(this.neighborNodes){
+				this.neighborNodes.put(newNode.getName(), newNode.clone());
+			}
+
 			
 			return;
 			
@@ -271,47 +283,61 @@ public class P2PNetwork {
 			System.out.println("Recevied \"UPDATE_PATROL_NACK\"");
 			this.send(new Message(newNode.ip,newNode.port,messageKind.REQ_UPDATED_PATROL, this.localNode));
 			return;
+			
 		case UPDATE_PATROL_ACK:
 			System.out.println("Recevied \"UPDATE_PATROL_ACK\"");
 			// 1. Update my node's information
 			this.localNode = message.getNewNode();
 			
 			// 2. Check if any of the neighbors are mine
-			for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
-				// need to clone the message here just in case newMessage updates before sending
-				if (this.localNode.isNeighbor(entry.getValue())){
-					// not a neighbor - drop it
-					this.neighborNodes.put(entry.getKey(), entry.getValue());
+			synchronized(this.neighborNodes){
+				for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
+					// need to clone the message here just in case newMessage updates before sending
+					if (this.localNode.isNeighbor(entry.getValue())){
+						// not a neighbor - drop it
+						this.neighborNodes.put(entry.getKey(), entry.getValue());
+					}
 				}
 			}
+
 			
 			// 3. Add SplitNode to my neighbors
-			this.neighborNodes.put(message.getSplitNode().getName(), message.getSplitNode().clone());
+			synchronized(this.neighborNodes){
+				this.neighborNodes.put(message.getSplitNode().getName(), message.getSplitNode().clone());
+			}
 			
 			
 			return;
+			
 		case NEIGHBOR_UPDATE:
 			System.out.println("Recevied \"NEIGHBOR_UPDATE\"");
 
 			System.out.println("NewNode: "+message.getNewNode().getName());
 			System.out.println("SplitNode: "+message.getSplitNode().getName());
 			// 1. check if newnode is a neighbor
-			if (this.localNode.isNeighbor(message.getNewNode())){
-				System.out.println("NewNode is a neighbor");
-				this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode().clone());
+			synchronized(this.neighborNodes){
+				if (this.localNode.isNeighbor(message.getNewNode())){
+					System.out.println("NewNode is a neighbor");
+					this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode().clone());
+				}
 			}
+
 
 			
 			// 2. check if SplitNode is still a neighbor
-			if (!this.localNode.isNeighbor(message.getSplitNode())){
-				// not a neighbor - drop it
-				System.out.println("SplitNode is no longer a neighbor");
-				this.neighborNodes.remove(message.getSplitNode().getName());
-			} else {
-				// is a neighbor, update it
-				System.out.println("SplitNode is still a neighbor");
-				this.neighborNodes.put(message.getSplitNode().getName(),message.getSplitNode());
+			synchronized(this.neighborNodes){
+				if (!this.localNode.isNeighbor(message.getSplitNode())){
+					// not a neighbor - drop it
+					System.out.println("SplitNode is no longer a neighbor");
+					this.neighborNodes.remove(message.getSplitNode().getName());
+				} else {
+					// is a neighbor, update it
+					System.out.println("SplitNode is still a neighbor");
+					this.neighborNodes.put(message.getSplitNode().getName(),message.getSplitNode());
+				}
 			}
+
+
 			return;
 					
 					
@@ -440,12 +466,13 @@ public class P2PNetwork {
 
 	public void printNeighborNodes(){
 		System.out.println("Printing Neighbor Nodes----------");
-		
-		for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
-		    System.out.println(entry.getValue().toString());
-		}
 
-		System.out.println("------------------------------");
+		synchronized(this.neighborNodes){
+			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+				System.out.println(entry.getValue().toString());
+			}
+		}
+		System.out.println("---------------------------------");
 	}
 	
 }
