@@ -34,14 +34,45 @@ public class NodePatrolArea implements Serializable{
 	
 	public boolean isNeighbor(NodePatrolArea testPatrolArea){
 		// check if there are matching coordinates
-		for (double me:this.range){
-			for(double test:testPatrolArea.range){
-				System.out.println("Compare: "+me +"=="+test);
-				if(me==test){
+		
+		double[] testRange = testPatrolArea.getRange();
+
+		double a1 = this.range[0];
+		double b1 = this.range[1];
+		double a2 = this.range[2];
+		double b2 = this.range[3];
+
+		double a3 = testRange[0];
+		double b3 = testRange[1];
+		double a4 = testRange[2];
+		double b4 = testRange[3];
+		
+		
+		if (a2==a3 || a1==a4){
+			if ( (a4-a3) <= (a2-a1)){
+				if ( ( a3>=a2) && (a3<=a1) ){
+					return true;
+				}
+			} else {
+				if ( ( a1<=a3) && (a1>=a4) ){
 					return true;
 				}
 			}
+			
+		} else if (b1==b4 || b2==b3){
+			if ( (b2-b1) >= (b4-b3) ){
+				if ( (b3 <= b2) && (b3 >= b1) ){
+					return true;
+				}
+			} else{
+				if ( (b2 >= b3) && ( b2 <= b4) ){
+					return true;
+				}
+				
+			}
+
 		}
+		
 		return false;
 	}
 	
