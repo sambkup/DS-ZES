@@ -13,7 +13,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import com.google.gson.Gson;
 import communication.Message.messageKind;
@@ -263,13 +265,23 @@ public class P2PNetwork {
 			
 			// 4. check if any of my neighbors are still neighbors
 			synchronized(this.neighborNodes){
-				for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
-					// need to clone the message here just in case newMessage updates before sending
+				for (Iterator<Map.Entry<String,Node>> it = this.neighborNodes.entrySet().iterator(); it.hasNext();){
+					Map.Entry<String,Node> entry = it.next();
 					if (!this.localNode.isNeighbor(entry.getValue())){
 						// not a neighbor - drop it
-						this.neighborNodes.remove(entry.getKey());
+						it.remove();
 					}
 				}
+				
+				
+				
+//				for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+//					// need to clone the message here just in case newMessage updates before sending
+//					if (!this.localNode.isNeighbor(entry.getValue())){
+//						// not a neighbor - drop it
+//						this.neighborNodes.remove(entry.getKey());
+//					}
+//				}
 			}
 			// 5. Add NewNode to my neighbors
 			synchronized(this.neighborNodes){
