@@ -240,6 +240,7 @@ public class P2PNetwork {
 			newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone			
 			Message newMessage = new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode);
 			newMessage.setNewNode(newNode);
+			System.out.println("NewNode set to: "+newNode.getName());
 			newMessage.setSplitNode(this.localNode);
 			newMessage.setNeighborNodes(this.neighborNodes);
 			this.send(newMessage);

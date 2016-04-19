@@ -48,7 +48,7 @@ public class Node implements Serializable {
 			// I cannot split my area with this node
 			// TODO: throw an error
 		}
-		testNode.myPatrolArea = myPatrolArea.splitPatrolArea(testNode.myLocation);
+		testNode.myPatrolArea = this.myPatrolArea.splitPatrolArea(testNode.myLocation);
 		return testNode;
 	}
 
