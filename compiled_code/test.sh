@@ -23,10 +23,10 @@ case $HOSTNAME in
 ("zes03") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.103 2 6;;
 ("zes04") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.104 2 8;;
 
-("zes05") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.105 4 2;;
-("zes06") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.106 4 4;;
-("zes07") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.107 4 6;;
-("zes08") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.108 4 8;;
+("zes05") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.105 8 2;;
+("zes06") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.106 8 4;;
+("zes07") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.107 8 6;;
+("zes08") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.108 8 8;;
 
 
 #("zes01") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.101 40.4431325 -79.9423925;;
