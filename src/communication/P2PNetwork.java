@@ -362,63 +362,84 @@ public class P2PNetwork {
 					
 					
 		case REQ_START:
-				System.out.println("Received \"REQ_START\"");
-				/* check if myloc is within my patrol area */
-//				System.out.println(message.toString());
-				if(this.localNode.inMyArea(newNode))	{
-					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
-				}
-				else{
-					Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+			System.out.println("Received \"REQ_START\"");
+			/* check if myloc is within my patrol area */
+//			System.out.println(message.toString());
+			if(this.localNode.inMyArea(newNode))	{
+				this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
+			} else{
+				Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+				if (closeNeighbour != null){
 					System.out.println(closeNeighbour.ip);
 					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
 					returnMessage.setClosestNode(closeNeighbour);
 					this.send(returnMessage);
-				}
-				return;
-		case MSG_JSON:
-				System.out.println("Received \"MSG_JSON\"");
-
-				
-				/**********************new logic********************/
-				//check if destloc is in my area. if yes, enter my location and send to phone
-				//else enter my location and send to closest neighbour from destlocation
-				//TODO: if my neighbours are unsafe, send back to the sender and ask to send to a different neighbour
-				
-				
-				/*enter my location to json */
-			JSONObject newJSON = message.getJsonRoute();
-			if (this.localNode.getState() == SensorState.SAFE) {
-				try {
-					newJSON = this.localNode.enterJSON(message.getJsonRoute());
-				} catch (Exception ex) {
-					System.out.println("error in entering my location to JSON");
-					ex.printStackTrace();
-				}
-			}
-			message.setJsonRoute(newJSON);
-			
-				/*get destination of user*/
-				String destloc = message.getDestLoc();
-				String latLng[] = destloc.split(",");
-				double latLong[] = new double[2];
-				latLong[0] = Double.parseDouble(latLng[0]);
-				latLong[1] = Double.parseDouble(latLng[1]);
-				NodeLocation destLoc = new NodeLocation(latLong);
-				
-				/*if my area, send to phone else to closest neighbour*/
-				if(this.localNode.myPatrolArea.inMyArea(destLoc)){
-					System.out.println("I am the last node in the chain");
+				} else {
+					// I am the only node, so complete the loop
+					
+					JSONObject newJSON = new JSONObject();
+					if (this.localNode.getState() == SensorState.SAFE) {
+						try {
+							newJSON = this.localNode.enterJSON(new JSONObject());
+						} catch (Exception ex) {
+							System.out.println("error in entering my location to JSON");
+							ex.printStackTrace();
+						}
+					}
+					message.setJsonRoute(newJSON);
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
+					message.setClosestNode(this.localNode);
+					this.send(message);
 				}
-				else{
-					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
-					message.setDestIP(closestNeighbor.ip); 
-					message.setDestPort(closestNeighbor.port);	
-				}
-				this.send(message);	
-				return;
+			}
+			return;
+	case MSG_JSON:
+		System.out.println("Received \"MSG_JSON\"");
+
+
+		/**********************new logic********************/
+		//check if destloc is in my area. if yes, enter my location and send to phone
+		//else enter my location and send to closest neighbour from destlocation
+		//TODO: if my neighbours are unsafe, send back to the sender and ask to send to a different neighbour
+
+
+		/*enter my location to json */
+		//	JSONObject newJSON = message.getJsonRoute();
+		JSONObject newJSON = new JSONObject();
+		if (this.localNode.getState() == SensorState.SAFE) {
+			try {
+				newJSON = this.localNode.enterJSON(message.getJsonRoute());
+			} catch (Exception ex) {
+				System.out.println("error in entering my location to JSON");
+				ex.printStackTrace();
+			}
+		}
+		message.setJsonRoute(newJSON);
+
+		/*get destination of user*/
+		String destloc = message.getDestLoc();
+		String latLng[] = destloc.split(",");
+		double latLong[] = new double[2];
+		latLong[0] = Double.parseDouble(latLng[0]);
+		latLong[1] = Double.parseDouble(latLng[1]);
+		NodeLocation destLoc = new NodeLocation(latLong);
+
+		/*if my area, send to phone else to closest neighbour*/
+		if(this.localNode.myPatrolArea.inMyArea(destLoc)){   //===============>remove !
+			System.out.println("I am the last node in the chain");
+			message.setDestIP(message.phoneIP);  //setting as phone
+			message.setDestPort(message.phonePort);
+			System.out.println("Route is "+message.jsonRoute.toString());
+		}
+		else{
+
+			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
+			message.setDestIP(closestNeighbor.ip); 
+			message.setDestPort(closestNeighbor.port);	
+		}
+		this.send(message);	
+		return;
 		default:
 			break;
 		}
