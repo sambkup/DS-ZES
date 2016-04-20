@@ -226,11 +226,11 @@ public class P2PNetwork {
 	public synchronized void receive_message(Message message, Connection c) {
 		
 		Node newNode = message.getNode();
-	
-//		System.out.println("new node's ip is "+newNode.ip);
-	
+		
 		switch (message.kind) {
 			
+		/* Node message handlers */
+		
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
 			// 1. Check if I can split, if not, send next closest node
@@ -360,6 +360,8 @@ public class P2PNetwork {
 
 			return;
 					
+		/* App message handlers */
+
 					
 		case REQ_START:
 			System.out.println("Received \"REQ_START\"");
