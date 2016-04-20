@@ -274,6 +274,8 @@ public class P2PNetwork {
 				/* check if myloc is within my patrol area */
 //				System.out.println(message.toString());
 				if(this.localNode.inMyArea(newNode))	{
+					
+					
 					this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 				}
 				else{
@@ -295,7 +297,8 @@ public class P2PNetwork {
 				
 				
 				/*enter my location to json */
-			JSONObject newJSON = message.getJsonRoute();
+		//	JSONObject newJSON = message.getJsonRoute();
+				JSONObject newJSON = new JSONObject();
 			if (this.localNode.getState() == SensorState.SAFE) {
 				try {
 					newJSON = this.localNode.enterJSON(message.getJsonRoute());
@@ -315,12 +318,14 @@ public class P2PNetwork {
 				NodeLocation destLoc = new NodeLocation(latLong);
 				
 				/*if my area, send to phone else to closest neighbour*/
-				if(this.localNode.myPatrolArea.inMyArea(destLoc)){
+				if(!this.localNode.myPatrolArea.inMyArea(destLoc)){   //===============>remove !
 					System.out.println("I am the last node in the chain");
 					message.setDestIP(message.phoneIP);  //setting as phone
 					message.setDestPort(message.phonePort);
+					System.out.println("Route is "+message.jsonRoute.toString());
 				}
 				else{
+					
 					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
 					message.setDestIP(closestNeighbor.ip); 
 					message.setDestPort(closestNeighbor.port);	
