@@ -516,7 +516,8 @@ public class P2PNetwork {
 			client.close();
 		}catch(IOException e)
 		{
-			e.printStackTrace();
+			System.out.println("Overlay phone not found");
+//			e.printStackTrace();
 		}
 		
 		
