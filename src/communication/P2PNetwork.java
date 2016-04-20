@@ -7,6 +7,8 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -77,6 +79,9 @@ public class P2PNetwork {
 		if (!findFirstNodeByIP()){
 			System.out.println("I am the first node");
 		}
+		
+		run_display_overlay(this);
+		
 		 
 	}
 	public void readfiles(String name) throws IOException{
@@ -326,18 +331,20 @@ public class P2PNetwork {
 
 			System.out.println("NewNode: "+message.getNewNode().getName());
 			System.out.println("SplitNode: "+message.getSplitNode().getName());
-			// 1. check if newnode is a neighbor
+			
 			synchronized(this.neighborNodes){
+
+			
+			
+				// 1. check if newnode is a neighbor
 				if (this.localNode.isNeighbor(message.getNewNode())){
 					System.out.println("NewNode is a neighbor");
 					this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode().clone());
 				}
-			}
 
 
 			
-			// 2. check if SplitNode is still a neighbor
-			synchronized(this.neighborNodes){
+				// 2. check if SplitNode is still a neighbor
 				if (!this.localNode.isNeighbor(message.getSplitNode())){
 					// not a neighbor - drop it
 					System.out.println("SplitNode is no longer a neighbor");
@@ -347,6 +354,7 @@ public class P2PNetwork {
 					System.out.println("SplitNode is still a neighbor");
 					this.neighborNodes.put(message.getSplitNode().getName(),message.getSplitNode());
 				}
+				
 			}
 
 
@@ -456,6 +464,64 @@ public class P2PNetwork {
 
 	}
 	
+	
+	private void run_display_overlay(P2PNetwork p2p) {
+		Thread receiver_thread = new Thread() {
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					p2p.sendOverlay();
+				}
+			}
+		};
+
+		receiver_thread.start();
+	}
+
+	private void sendOverlay(){
+		/*
+		 * code here to send to tablet
+		 */
+
+		String serverName = "192.168.2.121";
+		int port = 31337;
+		try
+		{
+			InetAddress address = InetAddress.getByName(serverName);
+			System.out.println("Connecting to " + serverName +" on port " + port);
+			Socket client = new Socket(address, port);
+			System.out.println("Just connected to " + client.getRemoteSocketAddress());
+			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
+
+			//create node object
+			//public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation, int port, String ip) {
+			//NodePatrolArea range --> {min_lattitude, min_longitute, max_latitude, max_longitude}
+//			double[] range = {40.44294, -79.94242, 40.44316, -79.9422};
+//			NodePatrolArea sampleNPA = new NodePatrolArea(range);
+//			double[] nodePlacement = {40.4431325, -79.9423925};
+//			P2PRegion p2preg = new P2PRegion(range);
+//			NodeLocation nodeLocation = new NodeLocation(nodePlacement);
+//			Node sampleNode = new Node(sampleNPA, p2preg, nodeLocation, 123, "hehehe");
+
+
+			oos.writeObject(this.localNode);
+
+
+			client.close();
+		}catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
 	
 	
 	@SuppressWarnings("unused")

@@ -37,10 +37,10 @@ public class SensorNode {
 		
 
 		String IP = findMyIPaddr();
-		IP  = "172.29.92.26"; //hardcoding it to get messags from android
+		IP  = "192.168.2.118"; //hardcoding it to get messags from android
 		
-		double[] range = {40.442954,-79.94247,40.443112,-79.942191};
-		double[] location = {40.443082,-79.942418}; // a second spot on campus
+		double[] range = {40.44294,-79.94242,40.44316,-79.9422};
+		double[] location = {40.4430225, -79.9423375}; // a second spot on campus
 		
 
 		// --------------------------------
