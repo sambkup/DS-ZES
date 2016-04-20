@@ -98,7 +98,10 @@ public class Node implements Serializable {
 	public JSONObject enterJSON(JSONObject route) throws JSONException {
 		int count = route.length();
 		count++;
-		route.put(String.valueOf(count), myLocation);
+		String coordinates = new String();
+		coordinates = String.valueOf(myLocation.getLocation()[0])+","+String.valueOf(myLocation.getLocation()[1]);
+		//route.put(String.valueOf(count), myLocation.getLocation());
+		route.put(String.valueOf(count), coordinates);
 		return route;
 	}
 
