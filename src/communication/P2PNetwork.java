@@ -244,15 +244,9 @@ public class P2PNetwork {
 				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
 				return;
 			}
-			
-			
-			
-			
-			
+
 			synchronized(this.neighborNodes){
 
-				
-				
 				// 2. Split the patrol area, send update to NewNode
 				Message newMessage = null;
 
@@ -273,8 +267,6 @@ public class P2PNetwork {
 					newMessage.setDestPort(entry.getValue().port);
 					this.send(newMessage);
 				}
-
-
 
 				// 4. check if any of my neighbors are still neighbors
 				for (Iterator<Map.Entry<String,Node>> it = this.neighborNodes.entrySet().iterator(); it.hasNext();){
@@ -302,6 +294,14 @@ public class P2PNetwork {
 			this.localNode = message.getNewNode();
 			
 			synchronized(this.neighborNodes){
+				
+				System.out.println("Checking Neighbor Nodes----------");
+				synchronized(this.neighborNodes){
+					for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
+						System.out.println(entry.getValue().toString());
+					}
+				}
+				System.out.println("---------------------------------");
 				
 				// 2. Check if any of the neighbors are mine
 				for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
@@ -332,6 +332,8 @@ public class P2PNetwork {
 				if (this.localNode.isNeighbor(message.getNewNode())){
 					System.out.println("NewNode is a neighbor");
 					this.neighborNodes.put(message.getNewNode().getName(), message.getNewNode().clone());
+				} else {
+					System.out.println("NewNode is not a neighbor");
 				}
 
 
@@ -514,13 +516,10 @@ public class P2PNetwork {
 		try
 		{
 			InetAddress address = InetAddress.getByName(serverName);
-			System.out.println("Connecting to " + serverName +" on port " + port);
 			Socket client = new Socket(address, port);
-			System.out.println("Just connected to " + client.getRemoteSocketAddress());
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
-
 			oos.writeObject(this.localNode);
-
+			System.out.println("Overlay updated");
 
 			client.close();
 		}catch(IOException e)
@@ -592,10 +591,7 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
-//				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
-//				System.out.println(message.toString());
-//				System.out.println("calling receive message function");
 				p2p.receive_message(message, this);
 			}
 
