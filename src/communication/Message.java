@@ -77,7 +77,7 @@ public class Message implements Serializable {
 
 
 		//TODO: check this supressed warning
-		clone.neighborNodes = (HashMap<String, Node>) this.neighborNodes.clone();
+		clone.neighborNodes = (HashMap<String, Node>) this.neighborNodes.clone(); // doesn't actually clone
 		clone.SplitNode = this.SplitNode.clone();
 		clone.NewNode = this.NewNode.clone();
 
