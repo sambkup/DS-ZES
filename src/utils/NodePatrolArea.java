@@ -30,6 +30,7 @@ public class NodePatrolArea implements Serializable{
 //			testCoordinates[1] > range[3] || testCoordinates[1] < range[1] ){
 //				return false;
 //		}
+//		return true;
 
 		double x1 = range[0];
 		double y1 = range[1];
@@ -37,13 +38,13 @@ public class NodePatrolArea implements Serializable{
 		double y2 = range[3];
 		double a1 = testCoordinates[0];
 		double b1 = testCoordinates[1];
-		if ( x1 < a1 && a1 < x2 && 
-			 y2 < b1 && b1 < y1){
+		if ( (x1 < a1) && (a1 < x2) && 
+			 (y2 < b1) && (b1 < y1)){
 			return true;
 		}
 		
 		
-		return true;
+		return false;
 	}
 	
 	public boolean isNeighbor(NodePatrolArea testPatrolArea){
