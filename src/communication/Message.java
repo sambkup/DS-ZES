@@ -35,6 +35,8 @@ public class Message implements Serializable {
 		UPDATE_PATROL_ACK,	
 		NEIGHBOR_UPDATE,
 		
+		STATE_TOGGLE,
+		
 		REQ_START, //message sent from phone to nodes to get a start node
 		MY_AREA, //response sent from node to phone saying if it's in the node's patrol area
 		NOT_MY_AREA, //response sent from node to phone saying the user is not in user's patrol area

@@ -65,7 +65,7 @@ public class P2PNetwork {
 				while (true) {
 					try {
 						sleep(5000);
-						readfiles("state.txt");
+						readfiles("resources/state.txt");
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -90,11 +90,11 @@ public class P2PNetwork {
 		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
 		line = br.readLine();
-		if(line.equalsIgnoreCase("safe")){
+		if(line.equalsIgnoreCase("0")){
 			this.localNode.setSafe();
 			
 		}
-		else if(line.equalsIgnoreCase("danger")){
+		else if(line.equalsIgnoreCase("1")){
 			this.localNode.setUnsafe();
 		}
 		fr.close();
