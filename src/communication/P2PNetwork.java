@@ -52,13 +52,27 @@ public class P2PNetwork {
 			return;
 		}
 		
-		// run server
+		/* run server */
 		Thread server = new Thread() {
 			public void run() {
 				listen_server();
 			}
 		};
 		server.start();
+		
+		
+		/* bootstrap */
+		System.out.println("Starting bootstrapping...");
+		if (!findFirstNodeByIP()){
+			System.out.println("I am the first node");
+		}
+		
+		
+		/* Run the overlay for demo */
+		
+		run_display_overlay(this);
+		
+		/* Check for an update to the state */
 		
 		Thread reader = new Thread() {
 			public void run() {
@@ -73,14 +87,8 @@ public class P2PNetwork {
 			}
 		};
 		reader.start();
+
 		
-		/* bootstrap */
-		System.out.println("Starting bootstrapping...");
-		if (!findFirstNodeByIP()){
-			System.out.println("I am the first node");
-		}
-		
-		run_display_overlay(this);
 		
 		 
 	}
@@ -122,56 +130,25 @@ public class P2PNetwork {
 				s.connect(endpoint, 101);
 				
 				s.close();
-				System.out.println(testIP+":"+this.localNode.port + " - Found first node");	
+				System.out.println(testIP+":"+this.localNode.port + " - Found first node");
+				
+				/* found the first node, so ask to be placed */
+				
 				Message message = new Message(testIP, this.localNode.port,messageKind.REQ_UPDATED_PATROL,this.localNode);
 				send(message);	
+				
 				return true;
 				
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 //				socket did not successfully open
-				System.out.println(testIP+":"+this.localNode.port + " - Closed");
+//				System.out.println(testIP+":"+this.localNode.port + " - Closed");
 				continue;
 			}
 		}
 		return false;
 
-	}
-
-
-	@SuppressWarnings("unused")
-	private boolean findFirstNodeByPort(){
-		String testIP = this.localNode.ip;
-		int localport = this.localNode.port;
-		int startport = 4000;
-		int endport = 4200;
-		
-		// TODO: randomize the start point, so the earlier ports aren't overwhelmed
-		for (int port = startport; port <= endport; port++){
-			// Ignore myself
-			if (port == localport){
-				continue;
-			}
-			
-			Socket s = null;
-			try {
-				s = new Socket(testIP, port);
-				
-				// if a socket successfully opened
-				s.close();
-				System.out.println(testIP+":"+port + " - Found first node");	
-				Message message = new Message(testIP, port,messageKind.REQ_UPDATED_PATROL,this.localNode);
-				send(message);	
-				return true;
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-//				socket did not successfully open
-//				System.out.println(testIP+":"+port + " - Closed");
-			}
-		}
-		return false;
 	}
 
 	public void send(Message message) {
@@ -235,7 +212,8 @@ public class P2PNetwork {
 		
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
-			// 1. Check if I can split, if not, send next closest node
+			
+			// 1. Check if I can split -> if not, send next closest node
 			
 			if (!localNode.inMyArea(newNode)){
 				// TODO: find which node the newNode should ask next
@@ -253,9 +231,11 @@ public class P2PNetwork {
 				newNode = localNode.splitPatrolArea(newNode); //split if sender is not phone			
 				newMessage = new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_ACK, newNode);
 				newMessage.setNewNode(newNode);
-				System.out.println("NewNode set to: "+newNode.getName());
 				newMessage.setSplitNode(this.localNode);
+				System.out.println("NewNode set to: "+newNode.getName() + " SplitNode set to: "+this.localNode.getName() );
+
 				newMessage.setNeighborNodes(this.neighborNodes);
+				// TODO: maybe need to syncronize this?
 				this.send(newMessage);
 
 
@@ -511,7 +491,7 @@ public class P2PNetwork {
 		 * code here to send to tablet
 		 */
 
-		String serverName = "192.168.2.121";
+		String serverName = "192.168.2.123";
 		int port = 31337;
 		try
 		{

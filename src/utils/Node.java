@@ -48,7 +48,115 @@ public class Node implements Serializable {
 			// I cannot split my area with this node
 			// TODO: throw an error
 		}
-		testNode.myPatrolArea = this.myPatrolArea.splitPatrolArea(testNode.myLocation);
+//		testNode.myPatrolArea = this.myPatrolArea.splitPatrolArea(testNode.myLocation);
+		double[] myLoc = this.myLocation.getLocation();
+		double a1 = myLoc[0];
+		double b1 = myLoc[1];
+		double[] testLoc = testNode.myLocation.getLocation();
+		double a2 = testLoc[0];
+		double b2 = testLoc[1];
+		
+		double[] myPatrol = this.myPatrolArea.getRange();
+		double x1 = myPatrol[0];
+		double y1 = myPatrol[1];
+		double x2 = myPatrol[2];
+		double y2 = myPatrol[3];
+		double[] testPatrol = new double[4];
+		double x3 = 0.0;
+		double y3 = 0.0;
+		double x4 = 0.0;
+		double y4 = 0.0;
+		
+		
+		/*
+		 * 1. Determine the geometry of the area, and how to split it
+		 * 	- If a square decide which axis to split
+		 * 2. Split the regions
+		 * 3. decide which region belongs to which node
+		 */
+		
+		if (Math.abs(x2-x1) == Math.abs(y2-y1)){
+			// square - now figure out which axis to split along
+			if ( Math.abs(a2-a1) > Math.abs(b2-b1)){
+				// further apart on x-axis, so split y
+//				x1 = x1;
+				x4 = x2;
+				x2 = x1+((x2-x1)/2);
+				x3 = x2;
+				
+//				y1 = y1;
+//				y2 = y2;
+				y3 = y1;
+				y4 = y2;
+				
+				
+			} else {
+				// further apart on y-axis, so split x	
+//				x1 = x1;
+//				x2 = x2;
+				x3 = x1;
+				x4 = x2;
+				
+//				y1 = y1;
+				y4 = y2;
+				y2 = y1 + ((y2-y1)/2);
+				y3 = y2;
+				
+
+			}
+		} else if (Math.abs(x2-x1) < Math.abs(y2-y1)) {
+			// y2-y1 is longer, so split along y
+//			x1 = x1;
+//			x2 = x2;
+			x3 = x1;
+			x4 = x2;
+			
+//			y1 = y1;
+			y4 = y2;
+			y2 = y1 + ((y2-y1)/2);
+			y3 = y2;
+
+			
+			
+			
+			
+		} else {
+			// x2-x1 is longer, so split along x
+//			x1 = x1;
+			x4 = x2;
+			x2 = x1+((x2-x1)/2);
+			x3 = x2;
+			
+//			y1 = y1;
+//			y2 = y2;
+			y3 = y1;
+			y4 = y2;
+			
+			
+		}
+		
+		
+		myPatrol[0] = x1;
+		myPatrol[1] = y1;
+		myPatrol[2] = x2;
+		myPatrol[3] = y2;		
+		NodePatrolArea patrolArea1 = new NodePatrolArea(myPatrol);
+		
+		testPatrol[0] = x3;
+		testPatrol[1] = y3;
+		testPatrol[2] = x4;
+		testPatrol[3] = y4;	
+		NodePatrolArea patrolArea2 = new NodePatrolArea(testPatrol);
+		
+		if (patrolArea1.inMyArea(testNode.myLocation)){
+			//patrol area 1 belongs to testNode
+			this.myPatrolArea = patrolArea2;
+			testNode.myPatrolArea = patrolArea1;
+		} else {
+			this.myPatrolArea = patrolArea1;
+			testNode.myPatrolArea = patrolArea2;
+		}
+		
 		return testNode;
 	}
 
