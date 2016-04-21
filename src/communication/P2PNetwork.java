@@ -231,6 +231,8 @@ public class P2PNetwork {
 			
 		/* Node message handlers */
 		
+		//TODO: wrap the whole thing in synchronized, not just each step
+		
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
 			// 1. Check if I can split, if not, send next closest node

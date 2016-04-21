@@ -121,7 +121,7 @@ public class NodePatrolArea implements Serializable{
 			newRange[0] = split;
 			
 			NodePatrolArea newPatrol = new NodePatrolArea(newRange);
-			if (newPatrol.inMyArea(testLocation)){
+			if (!newPatrol.inMyArea(testLocation)){
 				range[2] = split;
 				return newPatrol;
 			} else{
@@ -156,7 +156,7 @@ public class NodePatrolArea implements Serializable{
 			newRange[1] = split;
 			
 			NodePatrolArea newPatrol = new NodePatrolArea(newRange);
-			if (newPatrol.inMyArea(testLocation)){
+			if (!newPatrol.inMyArea(testLocation)){
 				range[3] = split;
 				return newPatrol;
 			} else{
