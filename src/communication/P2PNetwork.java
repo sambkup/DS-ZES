@@ -435,10 +435,15 @@ public class P2PNetwork {
 			System.out.println("Route is "+message.jsonRoute.toString());
 		}
 		else{
-
 			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
-			message.setDestIP(closestNeighbor.ip); 
-			message.setDestPort(closestNeighbor.port);	
+			if(closestNeighbor!=null){
+				message.setDestIP(closestNeighbor.ip); 
+				message.setDestPort(closestNeighbor.port);	
+			}
+			else{ //i dont have any safe neighbors, send it to phone
+				message.setDestIP(message.phoneIP);  //setting as phone
+				message.setDestPort(message.phonePort);
+			}
 		}
 		this.send(message);	
 		return;
@@ -488,7 +493,7 @@ public class P2PNetwork {
 	}
 	
 	
-	private void run_display_overlay(P2PNetwork p2p) {
+	private void run_display_overlay(final P2PNetwork p2p) {
 		Thread receiver_thread = new Thread() {
 			public void run() {
 				while (true) {
