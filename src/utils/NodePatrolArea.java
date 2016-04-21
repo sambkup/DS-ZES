@@ -50,40 +50,40 @@ public class NodePatrolArea implements Serializable{
 //		System.out.printf("(a1,b1);(a2,b2);(a3,b3);(a4,b4)\n");
 //		System.out.printf("(%f,%f);(%f,%f);(%f,%f);(%f,%f)\n", a1,b1,a2,b2,a3,b3,a4,b4);
 		if (a2==a3 || a1==a4){
-//			System.out.println("1");
+			System.out.println("1");
 			if ( (b4-b3) <= (b2-b1)){
-//				System.out.println("2");
+				System.out.println("2");
 				if ( ( b3>=b2) && (b3<=b1) ){
-//					System.out.println("3");
+					System.out.println("3");
 					return true;
 				}
 			} else {
-//				System.out.println("4");
+				System.out.println("4");
 				if ( ( b1<=b3) && (b1>=b4) ){
-//					System.out.println("5");
+					System.out.println("5");
 					return true;
 				}
 			}
 			
 		} else if (b1==b4 || b2==b3){
-//			System.out.println("6");
+			System.out.println("6");
 			if ( (a2-a1) >= (a4-a3) ){
-//				System.out.println("7");
+				System.out.println("7");
 				if ( (a3 <= a2) && (a3 >= a1) ){
-//					System.out.println("8");
+					System.out.println("8");
 					return true;
 				}
 			} else{
-//				System.out.println("9");
+				System.out.println("9");
 				if ( (a2 >= a3) && ( a2 <= a4) ){
-//					System.out.println("10");
+					System.out.println("10");
 					return true;
 				}
 				
 			}
 
 		}
-//		System.out.println("11");
+		System.out.println("11");
 		return false;
 	}
 	

@@ -253,6 +253,7 @@ public class P2PNetwork {
 					Map.Entry<String,Node> entry = it.next();
 					if (!this.localNode.isNeighbor(entry.getValue())){
 						// not a neighbor - drop it
+						System.out.println(entry.getKey() + " is no longer a neighbor");
 						it.remove();
 					}
 				}
