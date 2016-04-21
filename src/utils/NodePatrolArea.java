@@ -39,11 +39,9 @@ public class NodePatrolArea implements Serializable{
 		double a1 = testCoordinates[0];
 		double b1 = testCoordinates[1];
 		if ( (x1 < a1) && (a1 < x2) && 
-			 (y2 < b1) && (b1 < y1)){
+			 (y1 < b1) && (b1 < y2)){
 			return true;
 		}
-		
-		
 		return false;
 	}
 	

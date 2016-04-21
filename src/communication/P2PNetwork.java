@@ -213,18 +213,20 @@ public class P2PNetwork {
 		case REQ_UPDATED_PATROL:
 			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
 			
-			// 1. Check if I can split -> if not, send next closest node
-			
-			if (!localNode.inMyArea(newNode)){
-				// TODO: find which node the newNode should ask next
-				Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
-				System.out.printf("Next closest node is %s\n", nextNode.toString());
-				this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
-				return;
-			}
 
 			synchronized(this.neighborNodes){
 
+				// 1. Check if I can split -> if not, send next closest node
+				
+				if (!localNode.inMyArea(newNode)){
+					// TODO: find which node the newNode should ask next
+					Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+					System.out.printf("Next closest node is %s\n", nextNode.toString());
+					this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
+					return;
+				}
+
+				
 				// 2. Split the patrol area, send update to NewNode
 				Message newMessage = null;
 
