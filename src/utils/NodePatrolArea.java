@@ -24,11 +24,25 @@ public class NodePatrolArea implements Serializable{
 	 */
 	public boolean inMyArea(NodeLocation testLocation){
 		double[] testCoordinates = testLocation.getLocation();
+		
 		// if out of range in anything
-		if (testCoordinates[0] > range[2] || testCoordinates[0] < range[0] ||
-			testCoordinates[1] > range[3] || testCoordinates[1] < range[1] ){
-				return false;
+//		if (testCoordinates[0] > range[2] || testCoordinates[0] < range[0] ||
+//			testCoordinates[1] > range[3] || testCoordinates[1] < range[1] ){
+//				return false;
+//		}
+
+		double x1 = range[0];
+		double y1 = range[1];
+		double x2 = range[2];
+		double y2 = range[3];
+		double a1 = testCoordinates[0];
+		double b1 = testCoordinates[1];
+		if ( x1 < a1 && a1 < x2 && 
+			 y2 < b1 && b1 < y1){
+			return true;
 		}
+		
+		
 		return true;
 	}
 	
