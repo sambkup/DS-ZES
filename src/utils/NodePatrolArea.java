@@ -116,7 +116,7 @@ public class NodePatrolArea implements Serializable{
 	 * @param range the range to set
 	 */
 	public void setRange(double[] range) {
-		if(range[2]>=range[0]){
+		if(range[0]>=range[2]){
 			this.range[0]=range[0];
 			this.range[2]=range[2];
 		}else{
