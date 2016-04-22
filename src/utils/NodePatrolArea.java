@@ -131,10 +131,4 @@ public class NodePatrolArea implements Serializable{
 	}
 
 
-
-
-	
-	
-	
-
 }
