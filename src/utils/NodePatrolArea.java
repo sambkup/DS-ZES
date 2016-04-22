@@ -64,12 +64,12 @@ public class NodePatrolArea implements Serializable{
 			
 			// if 2nd edge is smaller
 			if ( Math.abs(y4-y3) <= Math.abs(y2-y1)){
-				if ( ( y2>=y3) && (y3>=y1) ){
+				if ( ( y2>=y3) && (y3>=y1) && ( y2>=y4) && (y4>=y1)){
 					return true;
 				}
 			// if 1st edge is smaller
 			} else if ( Math.abs(y4-y3) >= Math.abs(y2-y1))	{
-				if ( ( y4>=y1) && (y1>=y3) ){
+				if ( ( y4>=y1) && (y1>=y3) && ( y4>=y2) && (y2>=y3) ){
 					return true;
 				}
 			}
@@ -78,12 +78,12 @@ public class NodePatrolArea implements Serializable{
 			
 			// if 2nd edge is smaller
 			if ( Math.abs(x4-x3) <= Math.abs(x2-x1)){
-				if ( (x1 >= x3) && (x3 >= x2) ){
+				if ( (x1 >= x3) && (x3 >= x2) && (x1 >= x4) && (x4 >= x2) ){
 					return true;
 				}
 			} else if  ( Math.abs(x4-x3) >= Math.abs(x2-x1)){
 
-				if ( (x3 >= x2) && ( x2 >= x4) ){
+				if ( (x3 >= x2) && ( x2 >= x4) && (x3 >= x1) && ( x1 >= x4) ){
 					return true;
 				}
 				
