@@ -74,7 +74,7 @@ public class Node implements Serializable {
 		 * 3. decide which region belongs to which node
 		 */
 		
-		System.out.println("|x2-x1|="+Math.abs(x2-x1)+" |y2-y1|="+Math.abs(y2-y1));
+		System.out.println("|x2-x1|="+Math.abs(x2-x1)+" |y2-y1|="+Math.abs(y2-y1)+" |x2-x1|==|y2-y1|="+(Math.abs(x2-x1) == Math.abs(y2-y1)));
 		
 		if (Math.abs(x2-x1) == Math.abs(y2-y1)){
 			// square - now figure out which axis to split along
