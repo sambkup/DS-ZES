@@ -56,12 +56,11 @@ public class Node implements Serializable {
 		double a2 = testLoc[0];
 		double b2 = testLoc[1];
 		
-		double[] myPatrol = this.myPatrolArea.getRange();
-		double x1 = myPatrol[0];
-		double y1 = myPatrol[1];
-		double x2 = myPatrol[2];
-		double y2 = myPatrol[3];
-		double[] testPatrol = new double[4];
+		double[] patrolArea = this.myPatrolArea.getRange();
+		double x1 = patrolArea[0];
+		double y1 = patrolArea[1];
+		double x2 = patrolArea[2];
+		double y2 = patrolArea[3];
 		double x3 = 0.0;
 		double y3 = 0.0;
 		double x4 = 0.0;
@@ -77,20 +76,21 @@ public class Node implements Serializable {
 		
 		if (Math.abs(x2-x1) == Math.abs(y2-y1)){
 			// square - now figure out which axis to split along
+			System.out.println("Splitting a square region");
 			if ( Math.abs(a2-a1) > Math.abs(b2-b1)){
 				// further apart on x-axis, so split y
 //				x1 = x1;
 				x4 = x2;
-				x2 = x1+((x2-x1)/2);
+				x2 = x2+Math.abs(((x2-x1)/2));
 				x3 = x2;
 				
 //				y1 = y1;
 //				y2 = y2;
 				y3 = y1;
 				y4 = y2;
-				
-				
+
 			} else {
+
 				// further apart on y-axis, so split x	
 //				x1 = x1;
 //				x2 = x2;
@@ -99,9 +99,9 @@ public class Node implements Serializable {
 				
 //				y1 = y1;
 				y4 = y2;
-				y2 = y1 + ((y2-y1)/2);
+				y2 = y2 + Math.abs(((y2-y1)/2));
 				y3 = y2;
-				
+
 
 			}
 		} else if (Math.abs(x2-x1) < Math.abs(y2-y1)) {
@@ -113,7 +113,7 @@ public class Node implements Serializable {
 			
 //			y1 = y1;
 			y4 = y2;
-			y2 = y1 + ((y2-y1)/2);
+			y2 = y2 + Math.abs(((y2-y1)/2));
 			y3 = y2;
 
 			
@@ -124,7 +124,7 @@ public class Node implements Serializable {
 			// x2-x1 is longer, so split along x
 //			x1 = x1;
 			x4 = x2;
-			x2 = x1+((x2-x1)/2);
+			x2 = x2+Math.abs(((x2-x1)/2));
 			x3 = x2;
 			
 //			y1 = y1;
@@ -136,12 +136,13 @@ public class Node implements Serializable {
 		}
 		
 		
-		myPatrol[0] = x1;
-		myPatrol[1] = y1;
-		myPatrol[2] = x2;
-		myPatrol[3] = y2;		
-		NodePatrolArea patrolArea1 = new NodePatrolArea(myPatrol);
+		patrolArea[0] = x1;
+		patrolArea[1] = y1;
+		patrolArea[2] = x2;
+		patrolArea[3] = y2;		
+		NodePatrolArea patrolArea1 = new NodePatrolArea(patrolArea);
 		
+		double[] testPatrol = new double[4];
 		testPatrol[0] = x3;
 		testPatrol[1] = y3;
 		testPatrol[2] = x4;

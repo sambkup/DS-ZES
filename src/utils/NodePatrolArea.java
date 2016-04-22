@@ -36,10 +36,10 @@ public class NodePatrolArea implements Serializable{
 		double y1 = range[1];
 		double x2 = range[2];
 		double y2 = range[3];
-		double a1 = testCoordinates[0];
-		double b1 = testCoordinates[1];
-		if ( (x1 < a1) && (a1 < x2) && 
-			 (y1 < b1) && (b1 < y2)){
+		double a = testCoordinates[0];
+		double b = testCoordinates[1];
+		if ( (x2 < a) && (a < x1) && 
+			 (y1 < b) && (b < y2)){
 			return true;
 		}
 		return false;
@@ -103,95 +103,6 @@ public class NodePatrolArea implements Serializable{
 	public NodePatrolArea clone(){
 		return new NodePatrolArea(this.range);
 	}
-//	
-//	public NodePatrolArea splitPatrolArea(NodeLocation testLocation){
-//		if (!inMyArea(testLocation)){
-//			// I cannot split my area with this node
-//			// TODO: throw an error
-//		}
-//		
-//		double[] newRange = new double[4];		
-//		
-//		/*
-//		 * determine whether to split latt or long
-//		 * take whichever, and divide in half
-//		 * Update my patrol area, and retun the next node's new patrol area
-//		 * 
-//		 */
-//		
-//		
-//		if ((range[2]-range[0]) >= (range[3]-range[1])){
-//			// latt is longer, so split along latt
-//			
-//			double split = (range[2]-range[0])/2 + range[0];
-//			
-//			// same longitude
-//			newRange[3] = range[3];
-//			newRange[1] = range[1];
-//			
-//			// split the lats
-//			newRange[2] = range[2];
-//			newRange[0] = split;
-//			
-//			NodePatrolArea newPatrol = new NodePatrolArea(newRange);
-//			if (!newPatrol.inMyArea(testLocation)){
-//				range[2] = split;
-//				return newPatrol;
-//			} else{
-//				double split1 = (range[3]-range[1])/2 + range[1];
-//				
-//				// same latitude
-//				newRange[2] = range[2];
-//				newRange[0] = range[0];
-//				
-//				// split the latts
-//				newRange[3] = range[3];
-//				newRange[1] = split1;
-//				
-//				range[3] = split1;
-//
-//				return new NodePatrolArea(newRange);
-//				
-//			}
-//			
-//			
-//		} else {
-//			// latt is longer, so split along latt
-//			
-//			double split = (range[3]-range[1])/2 + range[1];
-//			
-//			// same latitude
-//			newRange[2] = range[2];
-//			newRange[0] = range[0];
-//			
-//			// split the latts
-//			newRange[3] = range[3];
-//			newRange[1] = split;
-//			
-//			NodePatrolArea newPatrol = new NodePatrolArea(newRange);
-//			if (!newPatrol.inMyArea(testLocation)){
-//				range[3] = split;
-//				return newPatrol;
-//			} else{
-//				double split1 = (range[2]-range[0])/2 + range[0];
-//				
-//				// same longitude
-//				newRange[3] = range[3];
-//				newRange[1] = range[1];
-//				
-//				// split the lats
-//				newRange[2] = range[2];
-//				newRange[0] = split1;
-//				range[2] = split1;
-//
-//				return new NodePatrolArea(newRange);
-//
-//				
-//			}
-//
-//			
-//		}
-//	}
 
 
 	/**
