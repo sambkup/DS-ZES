@@ -356,10 +356,10 @@ public class P2PNetwork {
 				} else {
 					// I am the only node, so complete the loop
 					
-					JSONObject newJSON = new JSONObject();
+					ArrayList<String> newJSON = new ArrayList<String>();
 					if (this.localNode.getState() == SensorState.SAFE) {
 						try {
-							newJSON = this.localNode.enterJSON(new JSONObject());
+							newJSON = this.localNode.enterLocation(new ArrayList<String>());
 						} catch (Exception ex) {
 							System.out.println("error in entering my location to JSON");
 							ex.printStackTrace();
@@ -385,10 +385,10 @@ public class P2PNetwork {
 
 		/*enter my location to json */
 		//	JSONObject newJSON = message.getJsonRoute();
-		JSONObject newJSON = new JSONObject();
+		ArrayList<String> newJSON = new ArrayList<String>();
 		if (this.localNode.getState() == SensorState.SAFE) {
 			try {
-				newJSON = this.localNode.enterJSON(message.getJsonRoute());
+				newJSON = this.localNode.enterLocation(message.getJsonRoute());
 			} catch (Exception ex) {
 				System.out.println("error in entering my location to JSON");
 				ex.printStackTrace();
