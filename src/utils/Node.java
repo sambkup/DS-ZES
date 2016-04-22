@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class Node implements Serializable {
 
 	public enum SensorState {
