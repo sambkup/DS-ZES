@@ -99,7 +99,7 @@ public class Node implements Serializable {
 				
 //				y1 = y1;
 				y4 = y2;
-				y2 = y2 + Math.abs(((y2-y1)/2));
+				y2 = y1 + Math.abs(((y2-y1)/2));
 				y3 = y2;
 
 
