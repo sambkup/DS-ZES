@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONException;
@@ -206,13 +207,12 @@ public class Node implements Serializable {
 		state = SensorState.SAFE;
 	}
 
-	public JSONObject enterJSON(JSONObject route) throws JSONException {
-		int count = route.length();
-		count++;
+	public ArrayList<String> enterLocation(ArrayList<String> route) {
+		
 		String coordinates = new String();
 		coordinates = String.valueOf(myLocation.getLocation()[0])+","+String.valueOf(myLocation.getLocation()[1]);
 		//route.put(String.valueOf(count), myLocation.getLocation());
-		route.put(String.valueOf(count), coordinates);
+		route.add(coordinates);
 		return route;
 	}
 
