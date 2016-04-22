@@ -50,53 +50,46 @@ public class NodePatrolArea implements Serializable{
 		
 		double[] testRange = testPatrolArea.getRange();
 
-		double a1 = this.range[0];
-		double b1 = this.range[1];
-		double a2 = this.range[2];
-		double b2 = this.range[3];
+		double x1 = this.range[0];
+		double y1 = this.range[1];
+		double x2 = this.range[2];
+		double y2 = this.range[3];
 
-		double a3 = testRange[0];
-		double b3 = testRange[1];
-		double a4 = testRange[2];
-		double b4 = testRange[3];
+		double x3 = testRange[0];
+		double y3 = testRange[1];
+		double x4 = testRange[2];
+		double y4 = testRange[3];
 
-//		System.out.printf("(a1,b1);(a2,b2);(a3,b3);(a4,b4)\n");
-//		System.out.printf("(%f,%f);(%f,%f);(%f,%f);(%f,%f)\n", a1,b1,a2,b2,a3,b3,a4,b4);
-		if (a2==a3 || a1==a4){
-			System.out.println("1");
-			if ( (b4-b3) <= (b2-b1)){
-				System.out.println("2");
-				if ( ( b3>=b2) && (b3<=b1) ){
-					System.out.println("3");
+		if (x2==x3 || x1==x4){
+			
+			// if 2nd edge is smaller
+			if ( Math.abs(y4-y3) <= Math.abs(y2-y1)){
+				if ( ( y2>=y3) && (y3>=y1) ){
 					return true;
 				}
-			} else {
-				System.out.println("4");
-				if ( ( b1<=b3) && (b1>=b4) ){
-					System.out.println("5");
+			// if 1st edge is smaller
+			} else if ( Math.abs(y4-y3) >= Math.abs(y2-y1))	{
+				if ( ( y4>=y1) && (y1>=y3) ){
 					return true;
 				}
 			}
 			
-		} else if (b1==b4 || b2==b3){
-			System.out.println("6");
-			if ( (a2-a1) >= (a4-a3) ){
-				System.out.println("7");
-				if ( (a3 <= a2) && (a3 >= a1) ){
-					System.out.println("8");
+		} else if (y1==y4 || y2==y3){
+			
+			// if 2nd edge is smaller
+			if ( Math.abs(x4-x3) <= Math.abs(x2-x1)){
+				if ( (x1 >= x3) && (x3 >= x2) ){
 					return true;
 				}
-			} else{
-				System.out.println("9");
-				if ( (a2 >= a3) && ( a2 <= a4) ){
-					System.out.println("10");
+			} else if  ( Math.abs(x4-x3) >= Math.abs(x2-x1)){
+
+				if ( (x3 >= x2) && ( x2 >= x4) ){
 					return true;
 				}
 				
 			}
 
 		}
-		System.out.println("11");
 		return false;
 	}
 	
