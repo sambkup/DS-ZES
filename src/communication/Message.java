@@ -1,6 +1,7 @@
 package communication;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONObject;
@@ -15,7 +16,7 @@ public class Message implements Serializable {
 	public Node node;
 	public String destLoc; //lat,lng, to store the destination of user
 	public String startNodeIP;
-	public JSONObject jsonRoute;
+	public ArrayList<String> jsonRoute;
 	public String phoneIP;
 	public int phonePort;
 	int seqNum;
@@ -156,11 +157,11 @@ public class Message implements Serializable {
 		this.destPort = destPort;
 	}
 
-	public JSONObject getJsonRoute() {
+	public ArrayList<String> getJsonRoute() {
 		return jsonRoute;
 	}
 
-	public void setJsonRoute(JSONObject jsonRoute) {
+	public void setJsonRoute(ArrayList<String> jsonRoute) {
 		this.jsonRoute = jsonRoute;
 	}
 

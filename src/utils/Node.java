@@ -212,7 +212,9 @@ public class Node implements Serializable {
 		String coordinates = new String();
 		coordinates = String.valueOf(myLocation.getLocation()[0])+","+String.valueOf(myLocation.getLocation()[1]);
 		//route.put(String.valueOf(count), myLocation.getLocation());
+		
 		route.add(coordinates);
+		route.add("40.4430775,-79.9423925");
 		return route;
 	}
 
