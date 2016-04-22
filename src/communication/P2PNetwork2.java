@@ -197,7 +197,7 @@ public class P2PNetwork2 {
 			jsonRequest.setPhonePort(this.localNode.port);
 			jsonRequest.setDestLoc("8,8");
 			jsonRequest.setStartNodeIP(newNode.ip);
-			jsonRequest.setJsonRoute(new JSONObject());
+			jsonRequest.setJsonRoute(new ArrayList<String>());
 			jsonRequest.setKind(messageKind.MSG_JSON);
 			send(jsonRequest);
 			return;
