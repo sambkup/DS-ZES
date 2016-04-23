@@ -214,7 +214,6 @@ public class Node implements Serializable {
 		//route.put(String.valueOf(count), myLocation.getLocation());
 		
 		route.add(coordinates);
-		route.add("40.4430775,-79.9423925");
 		return route;
 	}
 
