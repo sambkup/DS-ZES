@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONObject;
-
 import utils.Node;
 
 public class Message implements Serializable {

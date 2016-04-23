@@ -25,8 +25,6 @@ import utils.Node;
 import utils.Node.SensorState;
 import utils.NodeLocation;
 
-import org.json.*;
-
 
 public class P2PNetwork {
 

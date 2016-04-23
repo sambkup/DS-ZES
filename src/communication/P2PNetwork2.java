@@ -24,7 +24,6 @@ import communication.Message.messageKind;
 
 import utils.Node;
 
-import org.json.JSONObject;
 import com.google.gson.Gson;
 
 public class P2PNetwork2 {
