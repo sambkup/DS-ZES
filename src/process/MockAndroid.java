@@ -5,7 +5,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -13,6 +16,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 import communication.P2PNetwork2;
 import utils.Node;
@@ -36,8 +41,9 @@ public class MockAndroid {
 		int port = 4001;
 		
 
-		String IP = findMyIPaddr();
-		IP  = "192.168.2.118"; //hardcoding it to get messags from android
+		String IP = getIPAddress();
+		System.out.println("IP IS "+IP);
+	//	IP  = "192.168.2.118"; //hardcoding it to get messags from android
 		
 		double[] range = {0,0,0,0};
 		double[] location = {2,2}; // node 5
@@ -84,7 +90,28 @@ public class MockAndroid {
 		return x.getHostAddress();
 		
 	}
-
+	/*to get device's IP address*/
+	public static String getIPAddress() {
+		try {
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while(interfaces.hasMoreElements()) {
+				NetworkInterface intf = interfaces.nextElement();
+				Enumeration<InetAddress> addrs = intf.getInetAddresses();
+				while(addrs.hasMoreElements()) {
+					InetAddress addr = addrs.nextElement();
+					if (!addr.isLoopbackAddress()) {
+						String sAddr = addr.getHostAddress();
+						boolean isIPv4 = sAddr.indexOf(':')<0;
+						if (isIPv4) {
+							return sAddr;
+						}
+					}
+				}
+			}
+		} catch (Exception ex) {
+		System.out.println(ex.getMessage());}
+		return null;
+	}
 
 	
 	private static void message_prompt(P2PNetwork2 p2p) {
