@@ -208,8 +208,6 @@ public class Node implements Serializable {
 		
 		String coordinates = new String();
 		coordinates = String.valueOf(myLocation.getLocation()[0])+","+String.valueOf(myLocation.getLocation()[1]);
-		//route.put(String.valueOf(count), myLocation.getLocation());
-		
 		route.add(coordinates);
 		return route;
 	}
