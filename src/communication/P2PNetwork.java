@@ -233,7 +233,7 @@ public class P2PNetwork {
 				
 				if (!localNode.inMyArea(newNode)){
 					// TODO: find which node the newNode should ask next
-					Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+					Node nextNode = newNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes,null);
 					System.out.printf("Next closest node is %s\n", nextNode.toString());
 					this.send(new Message(newNode.ip,newNode.port,messageKind.UPDATE_PATROL_NACK, nextNode));
 					return;
@@ -364,7 +364,7 @@ public class P2PNetwork {
 			if(this.localNode.inMyArea(newNode))	{
 				this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
 			} else{
-				Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes);
+				Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes,null);
 				if (closeNeighbour != null){
 					System.out.println(closeNeighbour.ip);
 					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
@@ -428,19 +428,43 @@ public class P2PNetwork {
 			message.setDestPort(message.phonePort);
 			System.out.println("Route is "+message.jsonRoute.toString());
 		} else{
-			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
+			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes,message.senderNode);
 			if(closestNeighbor!=null){
 				System.out.println("Closest neighbor is: "+closestNeighbor.getName());
 				message.setDestIP(closestNeighbor.ip); 
 				message.setDestPort(closestNeighbor.port);	
-			} else{ //i dont have any safe neighbors, send it to phone
-				message.setDestIP(message.phoneIP);  //setting as phone
-				message.setDestPort(message.phonePort);
+			} else{ //i dont have any safe neighbors other than the sender, send it to sender
+				message.setKind(messageKind.NO_NEIGHBORS);
+				message.setDestIP(message.senderNode.ip);
+				message.setDestPort(message.senderNode.port);
 			}
 		}
+		message.setSenderNode(localNode);
 		this.send(message);	
 		return;
 		
+		/* send to a different neighbor, my location already in route - so need not enter;*/
+		
+	case NO_NEIGHBORS:
+		message.setSenderNode(localNode);
+		String destloc2 = message.getDestLoc();
+		String latLng2[] = destloc2.split(",");
+		double latLong2[] = new double[2];
+		latLong2[0] = Double.parseDouble(latLng2[0]);
+		latLong2[1] = Double.parseDouble(latLng2[1]);
+		NodeLocation destLoc2 = new NodeLocation(latLong2);
+		Node closestNeighbor = localNode.findClosestNode(latLong2, neighborNodes,message.senderNode);
+		if(closestNeighbor!=null){
+			System.out.println("Closest neighbor is: "+closestNeighbor.getName());
+			message.setKind(messageKind.MSG_JSON);
+			message.setDestIP(closestNeighbor.ip); 
+			message.setDestPort(closestNeighbor.port);	
+		} else{ //NOT SURE WHAT TO DO
+			message.setKind(messageKind.MSG_JSON);
+			message.setDestIP(message.phoneIP);  //setting as phone
+			message.setDestPort(message.phonePort);
+			
+		}
 		default:
 			break;
 		}
