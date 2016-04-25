@@ -73,6 +73,7 @@ public class MockAndroid {
 		receiver_thread.start();
 	}
 
+	@SuppressWarnings("unused")
 	private static String findMyIPaddr(){
 		// TODO: make this failure tolerant
 		InetAddress x = null;

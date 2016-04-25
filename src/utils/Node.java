@@ -168,17 +168,13 @@ public class Node implements Serializable {
 	 */
 	public Node findClosestNode(double[] latLong, HashMap<String, Node> neighborNodes) {
 		Node returnNode = null;
-		double minDistance = 0;
+		double old_dist = Double.MAX_VALUE;
 		for (String key : neighborNodes.keySet()) {
 			Node neighbor = neighborNodes.get(key);
 			double dist = neighbor.myLocation.findDistance(latLong);
 			System.out.println("Dist to "+neighbor.getName()+" is: "+dist);
-			if (minDistance == 0) {
-				minDistance = dist;
-				returnNode = neighbor;
-				continue;
-			}
-			if (dist < minDistance) {
+			if (dist <= old_dist) {
+				old_dist = dist;
 				returnNode = neighbor;
 			}
 		}
