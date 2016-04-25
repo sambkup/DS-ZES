@@ -157,7 +157,7 @@ public class P2PNetwork {
 		String ip = message.destIP;
 		int port = message.destPort;
 		
-		System.out.println("Sending message to "+ip+":"+port);
+		System.out.println("Sending message "+message.getKind()+" to "+ip+":"+port);
 
 		Socket s = null;
 		Connection connection_to_use = null;
@@ -173,7 +173,7 @@ public class P2PNetwork {
 			System.out.println("Client EOF error:" + e.getMessage());
 		} catch (IOException e) {
 			System.out.println("Client readline error:" + e.getMessage());
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		
 		if (connection_to_use == null) {
@@ -621,7 +621,7 @@ class Connection extends Thread {
 			}
 
 		} catch (EOFException e) {
-			System.out.println("Server EOF:" + e.getMessage());
+//			System.out.println("Server EOF:" + e.getMessage());
 			
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
