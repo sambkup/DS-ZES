@@ -40,7 +40,7 @@ public class NodeLocation implements Serializable{
 	public double findDistance(double[] loc){
 		double deltaLat = loc[0]-this.location[0];
 		double deltaLon = loc[1]-this.location[1];
-		double dist = Math.pow(deltaLat,2)+Math.pow(deltaLon,2);
+		double dist = Math.pow(deltaLat,2.0)+Math.pow(deltaLon,2.0);
 		dist = Math.pow(dist, 0.5);	
 		return dist;
 	}

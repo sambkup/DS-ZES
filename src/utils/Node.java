@@ -172,6 +172,7 @@ public class Node implements Serializable {
 		for (String key : neighborNodes.keySet()) {
 			Node neighbor = neighborNodes.get(key);
 			double dist = neighbor.myLocation.findDistance(latLong);
+			System.out.println("Dist to "+neighbor.getName()+" is: "+dist);
 			if (minDistance == 0) {
 				minDistance = dist;
 				returnNode = neighbor;
