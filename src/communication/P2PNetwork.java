@@ -408,20 +408,20 @@ public class P2PNetwork {
 			message.setDestIP(message.phoneIP);  //setting as phone
 			message.setDestPort(message.phonePort);
 			System.out.println("Route is "+message.jsonRoute.toString());
-		}
-		else{
+		} else{
 			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes);
 			if(closestNeighbor!=null){
+				System.out.println("Closest neighbor is: "+closestNeighbor.getName());
 				message.setDestIP(closestNeighbor.ip); 
 				message.setDestPort(closestNeighbor.port);	
-			}
-			else{ //i dont have any safe neighbors, send it to phone
+			} else{ //i dont have any safe neighbors, send it to phone
 				message.setDestIP(message.phoneIP);  //setting as phone
 				message.setDestPort(message.phonePort);
 			}
 		}
 		this.send(message);	
 		return;
+		
 		default:
 			break;
 		}
