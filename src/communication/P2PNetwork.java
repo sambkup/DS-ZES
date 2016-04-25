@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.Gson;
 import communication.Message.messageKind;
 import utils.Node;
@@ -27,6 +31,8 @@ import utils.NodeLocation;
 
 
 public class P2PNetwork {
+
+	private final ScheduledExecutorService heatBeatScheduler = Executors.newScheduledThreadPool(1);
 
 	public Node localNode;
 
@@ -72,7 +78,12 @@ public class P2PNetwork {
 		
 		/* run the heartbeat */
 		
-		runHeartBeat(this);
+		try {
+			runHeartBeat(this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 //		/* Check for an update to the state */
 //		
@@ -520,27 +531,20 @@ public class P2PNetwork {
 		
 		
 	}
+
 	
-	
-	private void runHeartBeat(final P2PNetwork p2p) {
-		Thread receiver_thread = new Thread() {
+	private void runHeartBeat(final P2PNetwork p2p) throws IOException {
+		Runnable update = new Runnable() {
 			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					p2p.sendHeartBeat();
-				}
+				p2p.sendHeartBeat();
 			}
 		};
-
-		receiver_thread.start();
+		// update the config file every 'time_interval'
+		this.heatBeatScheduler.scheduleAtFixedRate(update, 0, 1, TimeUnit.SECONDS);
 	}
 
+	
+	
 	
 	private void sendHeartBeat(){
 		// go through each neighbor and sent a heartbeat
