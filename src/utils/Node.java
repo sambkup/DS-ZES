@@ -18,6 +18,8 @@ public class Node implements Serializable {
 	public P2PRegion p2pPatrolArea;
 	public NodeLocation myLocation;
 	public SensorState state;
+	
+	private int heartBeatCount = 0;
 
 	public Node(NodePatrolArea myPatrolArea, P2PRegion p2pPatrolArea, NodeLocation myLocation, int port, String ip) {
 
@@ -34,7 +36,23 @@ public class Node implements Serializable {
 				this.ip);
 		clone.state = this.state;
 		return clone;
-
+	}
+	
+	public boolean heartBeat(){
+		// increment the heatbeat counter
+		this.heartBeatCount++;
+		
+		// check if the heartbeat counter is above a threshold
+		if (this.heartBeatCount > 5){
+			// above threshold mean this node is dead
+			return false;
+		}
+		return true;
+		
+	}
+	
+	public void resetHeartBeat(){
+		this.heartBeatCount = 0;
 	}
 
 	public boolean inMyArea(Node testNode) {
@@ -210,7 +228,10 @@ public class Node implements Serializable {
 	}
 
 	public String toString() {
-		return String.format("(%s:%d), %s, %s", ip, port, myLocation.toString(), myPatrolArea.toString());
+		String[] chunks = this.ip.split("[.]");
+		int nodeNum = Integer.parseInt(chunks[3])-100;
+		
+		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s", nodeNum, myLocation.toString(), myPatrolArea.toString());
 	}
 
 }

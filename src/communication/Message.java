@@ -34,6 +34,8 @@ public class Message implements Serializable {
 		UPDATE_PATROL_ACK,	
 		NEIGHBOR_UPDATE,
 		
+		HEARTBEAT,
+		
 		STATE_TOGGLE,
 		
 		REQ_START, //message sent from phone to nodes to get a start node

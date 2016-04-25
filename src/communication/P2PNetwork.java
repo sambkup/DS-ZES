@@ -70,21 +70,25 @@ public class P2PNetwork {
 		
 		run_display_overlay(this);
 		
-		/* Check for an update to the state */
+		/* run the heartbeat */
 		
-		Thread reader = new Thread() {
-			public void run() {
-				while (true) {
-					try {
-						sleep(5000);
-						readfiles("resources/state.txt");
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
-					}
-				}
-			}
-		};
-		reader.start();
+		runHeartBeat(this);
+		
+//		/* Check for an update to the state */
+//		
+//		Thread reader = new Thread() {
+//			public void run() {
+//				while (true) {
+//					try {
+//						sleep(5000);
+//						readfiles("resources/state.txt");
+//					} catch (Exception e) {
+//						System.out.println(e.getMessage());
+//					}
+//				}
+//			}
+//		};
+//		reader.start();
 
 		
 		
@@ -277,10 +281,8 @@ public class P2PNetwork {
 			synchronized(this.neighborNodes){
 				
 				System.out.println("Checking Neighbor Nodes----------");
-				synchronized(this.neighborNodes){
-					for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
-						System.out.println(entry.getValue().toString());
-					}
+				for (Entry<String, Node> entry : message.getNeighborNodes().entrySet()) {
+					System.out.println(entry.getValue().toString());
 				}
 				System.out.println("---------------------------------");
 				
@@ -333,6 +335,12 @@ public class P2PNetwork {
 			}
 
 
+			return;
+			
+		case HEARTBEAT:
+			// when receive a heartbeat, reset the counter for this node.
+			String key = newNode.getName();
+			this.neighborNodes.get(key).resetHeartBeat();
 			return;
 					
 		/* App message handlers */
@@ -511,6 +519,42 @@ public class P2PNetwork {
 		
 		
 		
+	}
+	
+	
+	private void runHeartBeat(final P2PNetwork p2p) {
+		Thread receiver_thread = new Thread() {
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					p2p.sendHeartBeat();
+				}
+			}
+		};
+
+		receiver_thread.start();
+	}
+
+	
+	private void sendHeartBeat(){
+		// go through each neighbor and sent a heartbeat
+		Message newMessage = new Message(null,0,messageKind.HEARTBEAT,this.localNode);
+
+		System.out.println("Sending Heartbeat");
+		synchronized(this.neighborNodes){
+			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
+				// need to clone the message here just in case newMessage updates before sending
+				newMessage.setDestIP(entry.getValue().ip);
+				newMessage.setDestPort(entry.getValue().port);
+				this.send(newMessage);
+			}			
+		}
 	}
 	
 	
