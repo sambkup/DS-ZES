@@ -550,10 +550,13 @@ public class P2PNetwork {
 		// go through each neighbor and sent a heartbeat
 		Message newMessage = new Message(null,0,messageKind.HEARTBEAT,this.localNode);
 
-		System.out.println("Sending Heartbeat");
+//		System.out.println("Sending Heartbeat");
 		synchronized(this.neighborNodes){
 			for (Entry<String, Node> entry : this.neighborNodes.entrySet()) {
 				// need to clone the message here just in case newMessage updates before sending
+				if (!entry.getValue().heartBeat() ){
+					System.out.println("Node: " + entry.getValue().getName() + " is dead");
+				}
 				newMessage.setDestIP(entry.getValue().ip);
 				newMessage.setDestPort(entry.getValue().port);
 				this.send(newMessage);

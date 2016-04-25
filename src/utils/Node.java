@@ -231,7 +231,7 @@ public class Node implements Serializable {
 		String[] chunks = this.ip.split("[.]");
 		int nodeNum = Integer.parseInt(chunks[3])-100;
 		
-		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s \tHEartbeat: %d", nodeNum, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount);
+		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s \tHeartbeat: %d", nodeNum, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount);
 	}
 
 }
