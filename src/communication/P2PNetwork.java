@@ -216,6 +216,7 @@ public class P2PNetwork {
 	public synchronized void receive_message(Message message, Connection c) {
 		
 		Node newNode = message.getNode();
+		Node sourceNode = message.getSenderNode();
 		
 		switch (message.kind) {
 			
@@ -361,13 +362,13 @@ public class P2PNetwork {
 			System.out.println("Received \"REQ_START\"");
 			/* check if myloc is within my patrol area */
 //			System.out.println(message.toString());
-			if(this.localNode.inMyArea(newNode))	{
-				this.send((new Message(newNode.ip,newNode.port,messageKind.MY_AREA, this.localNode)));
+			if(this.localNode.inMyArea(sourceNode))	{
+				this.send((new Message(sourceNode.ip,sourceNode.port,messageKind.MY_AREA, this.localNode)));
 			} else{
-				Node closeNeighbour = this.localNode.findClosestNode(newNode.myLocation.getLocation(), this.neighborNodes,null);
+				Node closeNeighbour = this.localNode.findClosestNode(sourceNode.myLocation.getLocation(), this.neighborNodes,null);
 				if (closeNeighbour != null){
 					System.out.println(closeNeighbour.ip);
-					Message returnMessage = new Message(newNode.ip,newNode.port,messageKind.NOT_MY_AREA, this.localNode);
+					Message returnMessage = new Message(sourceNode.ip,sourceNode.port,messageKind.NOT_MY_AREA, this.localNode);
 					returnMessage.setClosestNode(closeNeighbour);
 					this.send(returnMessage);
 				} else {
@@ -422,7 +423,7 @@ public class P2PNetwork {
 		NodeLocation destLoc = new NodeLocation(latLong);
 
 		/*if my area, send to phone else to closest neighbour*/
-		if(this.localNode.myPatrolArea.inMyArea(destLoc)){   //===============>remove !
+		if(this.localNode.myPatrolArea.inMyArea(destLoc)){   
 			System.out.println("I am the last node in the chain");
 			message.setDestIP(message.phoneIP);  //setting as phone
 			message.setDestPort(message.phonePort);
@@ -446,7 +447,7 @@ public class P2PNetwork {
 		/* send to a different neighbor, my location already in route - so need not enter;*/
 		
 	case NO_NEIGHBORS:
-		message.setSenderNode(localNode);
+		
 		String destloc2 = message.getDestLoc();
 		String latLng2[] = destloc2.split(",");
 		double latLong2[] = new double[2];
@@ -455,16 +456,18 @@ public class P2PNetwork {
 		NodeLocation destLoc2 = new NodeLocation(latLong2);
 		Node closestNeighbor = localNode.findClosestNode(latLong2, neighborNodes,message.senderNode);
 		if(closestNeighbor!=null){
-			System.out.println("Closest neighbor is: "+closestNeighbor.getName());
+			System.out.println(" Next Closest neighbor is: "+closestNeighbor.getName());
 			message.setKind(messageKind.MSG_JSON);
 			message.setDestIP(closestNeighbor.ip); 
 			message.setDestPort(closestNeighbor.port);	
-		} else{ //NOT SURE WHAT TO DO
+		} else{ //NOT SURE WHAT TO DO! send a game over message?
 			message.setKind(messageKind.MSG_JSON);
 			message.setDestIP(message.phoneIP);  //setting as phone
-			message.setDestPort(message.phonePort);
-			
+			message.setDestPort(message.phonePort);	
 		}
+		message.setSenderNode(localNode);
+		this.send(message);	
+		break;
 		default:
 			break;
 		}
