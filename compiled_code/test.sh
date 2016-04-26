@@ -1,22 +1,9 @@
 #!/bin/bash
 
-
-# put code here to initialize pin 14 as an output pin
-# double check this code:
-
-# not my laptop
-if [ "$HOSTNAME" != "E2-kupfer" ]; then
-    echo "test";
-    echo 14 > /sys/class/gpio/export || echo "14 already open";
-    echo in > /sys/class/gpio/gpio14/direction;
-    cat /sys/class/gpio/gpio14/value;
-fi
-
-FILENAME="DeployedNodeV0_08.jar"
+FILENAME="DeployedNodeV0_09.jar"
 
 # set the nodes to have reserved IPs
 case $HOSTNAME in
-("E2-kupfer") echo "on kupfer $FILENAME";;
 
 ("zes01") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.101 40.4431325 -79.9423925;;
 ("zes02") java -jar ~/DS-ZES/compiled_code/$FILENAME 192.168.2.102 40.4431325 -79.9423375;;
