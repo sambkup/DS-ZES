@@ -238,7 +238,13 @@ public class Node implements Serializable {
 		String[] chunks = this.ip.split("[.]");
 		int nodeNum = Integer.parseInt(chunks[3])-100;
 		
-		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s \tHeartbeat: %d", nodeNum, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount);
+		String result = "alive";
+		if (this.heartBeatCount > 5){
+			result = "dead";
+		}
+		
+		
+		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s \tHeartbeat: %d; \t%s", nodeNum, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount, result);
 	}
 
 }

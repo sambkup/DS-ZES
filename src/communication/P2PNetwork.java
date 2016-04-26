@@ -216,7 +216,6 @@ public class P2PNetwork {
 	public synchronized void receive_message(Message message, Connection c) {
 		
 		Node newNode = message.getNode();
-		Node sourceNode = message.getSenderNode();
 		
 		switch (message.kind) {
 			
@@ -360,6 +359,8 @@ public class P2PNetwork {
 					
 		case REQ_START:
 			System.out.println("Received \"REQ_START\"");
+			Node sourceNode = message.getSenderNode();
+
 			/* check if myloc is within my patrol area */
 //			System.out.println(message.toString());
 			if(this.localNode.inMyArea(sourceNode))	{
