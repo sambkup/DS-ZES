@@ -355,9 +355,9 @@ public class P2PNetwork {
 			synchronized(this.neighborNodes){
 				this.neighborNodes.get(key).resetHeartBeat();
 				if (newNode.getState() == SensorState.SAFE){
-					this.neighborNodes.get(key).setUnsafe();
-				} else{
 					this.neighborNodes.get(key).setSafe();
+				} else{
+					this.neighborNodes.get(key).setUnsafe();
 				}
 			}
 
@@ -370,9 +370,9 @@ public class P2PNetwork {
 			System.out.println("Recevied \"STATE_TOGGLE\"");
 			synchronized (this.localNode){
 				if (this.localNode.getState() == SensorState.SAFE){
-					this.localNode.setSafe();
-				} else{
 					this.localNode.setUnsafe();
+				} else{
+					this.localNode.setSafe();
 				}
 			}
 			return;
