@@ -351,7 +351,14 @@ public class P2PNetwork {
 		case HEARTBEAT:
 			// when receive a heartbeat, reset the counter for this node.
 			String key = newNode.getName();
-			this.neighborNodes.get(key).resetHeartBeat();
+			synchronized(this.neighborNodes){
+				this.neighborNodes.get(key).resetHeartBeat();
+				if (newNode.getState() == SensorState.SAFE){
+					this.neighborNodes.get(key).setUnsafe();
+				} else{
+					this.neighborNodes.get(key).setSafe();
+				}
+			}
 			return;
 					
 		/* Overlay message handlers */
