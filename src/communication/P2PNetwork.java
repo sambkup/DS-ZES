@@ -349,6 +349,7 @@ public class P2PNetwork {
 			return;
 			
 		case HEARTBEAT:
+//			System.out.println("Recevied \"HEARTBEAT\"");
 			// when receive a heartbeat, reset the counter for this node.
 			String key = newNode.getName();
 			synchronized(this.neighborNodes){
@@ -359,6 +360,7 @@ public class P2PNetwork {
 					this.neighborNodes.get(key).setSafe();
 				}
 			}
+
 			return;
 					
 		/* Overlay message handlers */
@@ -368,9 +370,9 @@ public class P2PNetwork {
 			System.out.println("Recevied \"STATE_TOGGLE\"");
 			synchronized (this.localNode){
 				if (this.localNode.getState() == SensorState.SAFE){
-					this.localNode.setUnsafe();
-				} else{
 					this.localNode.setSafe();
+				} else{
+					this.localNode.setUnsafe();
 				}
 			}
 			return;
