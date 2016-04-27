@@ -664,7 +664,6 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
-				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
 				p2p.receive_message(message, this);
 			}
