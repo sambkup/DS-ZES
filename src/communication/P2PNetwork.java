@@ -354,9 +354,22 @@ public class P2PNetwork {
 			this.neighborNodes.get(key).resetHeartBeat();
 			return;
 					
-		/* App message handlers */
+		/* Overlay message handlers */
 
-					
+			
+		case STATE_TOGGLE:
+			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
+			synchronized (this.localNode){
+				if (this.localNode.getState() == SensorState.SAFE){
+					this.localNode.setUnsafe();
+				} else{
+					this.localNode.setSafe();
+				}
+			}
+			return;
+			
+		/* App message handlers */
+	
 		case REQ_START:
 			System.out.println("Received \"REQ_START\"");
 			Node sourceNode = message.getSenderNode();
