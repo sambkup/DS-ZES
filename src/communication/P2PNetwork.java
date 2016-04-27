@@ -424,18 +424,7 @@ public class P2PNetwork {
 		//TODO: if my neighbours are unsafe, send back to the sender and ask to send to a different neighbour
 
 
-		/*enter my location to json */
-		//	JSONObject newJSON = message.getJsonRoute();
-		ArrayList<String> newJSON = new ArrayList<String>();
-		if (this.localNode.getState() == SensorState.SAFE) {
-			try {
-				newJSON = this.localNode.enterLocation(message.getJsonRoute());
-			} catch (Exception ex) {
-				System.out.println("error in entering my location to JSON");
-				ex.printStackTrace();
-			}
-		}
-		message.setJsonRoute(newJSON);
+	
 
 		/*get destination of user*/
 		String destloc = message.getDestLoc();
@@ -450,6 +439,18 @@ public class P2PNetwork {
 			System.out.println("I am the last node in the chain");
 			message.setDestIP(message.phoneIP);  //setting as phone
 			message.setDestPort(message.phonePort);
+			/*enter my location to json */
+			//	JSONObject newJSON = message.getJsonRoute();
+			ArrayList<String> newJSON = new ArrayList<String>();
+			if (this.localNode.getState() == SensorState.SAFE) {
+				try {
+					newJSON = this.localNode.enterLocation(message.getJsonRoute());
+				} catch (Exception ex) {
+					System.out.println("error in entering my location to JSON");
+					ex.printStackTrace();
+				}
+			}
+			message.setJsonRoute(newJSON);
 			System.out.println("Route is "+message.jsonRoute.toString());
 		} else{
 			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes,message.senderNode);
@@ -457,6 +458,18 @@ public class P2PNetwork {
 				System.out.println("Closest neighbor is: "+closestNeighbor.getName());
 				message.setDestIP(closestNeighbor.ip); 
 				message.setDestPort(closestNeighbor.port);	
+				/*enter my location to json */
+				//	JSONObject newJSON = message.getJsonRoute();
+				ArrayList<String> newJSON = new ArrayList<String>();
+				if (this.localNode.getState() == SensorState.SAFE) {
+					try {
+						newJSON = this.localNode.enterLocation(message.getJsonRoute());
+					} catch (Exception ex) {
+						System.out.println("error in entering my location to JSON");
+						ex.printStackTrace();
+					}
+				}
+				message.setJsonRoute(newJSON);
 			} else{ //i dont have any safe neighbors other than the sender, send it to sender
 				message.setKind(messageKind.NO_NEIGHBORS);
 				message.setDestIP(message.senderNode.ip);
