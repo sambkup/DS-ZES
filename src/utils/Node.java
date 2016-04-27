@@ -244,7 +244,7 @@ public class Node implements Serializable {
 		}
 		
 		
-		return String.format("Node %d; \tLocation: %s; \tPatrol Area: %s \tHeartbeat: %d; \t%s", nodeNum, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount, result);
+		return String.format("Node %d %s; \tLocation: %s; \tPatrol Area: %s \tHeartbeat: %d; \t%s", nodeNum, this.state, myLocation.toString(), myPatrolArea.toString(), this.heartBeatCount, result);
 	}
 
 }
