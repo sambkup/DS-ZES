@@ -358,7 +358,7 @@ public class P2PNetwork {
 
 			
 		case STATE_TOGGLE:
-			System.out.println("Recevied \"REQ_UPDATED_PATROL\"");
+			System.out.println("Recevied \"STATE_TOGGLE\"");
 			synchronized (this.localNode){
 				if (this.localNode.getState() == SensorState.SAFE){
 					this.localNode.setUnsafe();
@@ -664,6 +664,7 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
+				System.out.println(json);
 				Message message = gson.fromJson(json, Message.class);
 				p2p.receive_message(message, this);
 			}

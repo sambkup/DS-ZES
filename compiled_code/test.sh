@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+
+
 FILENAME="DeployedNodeV0_10.jar"
 
 # set the nodes to have reserved IPs
