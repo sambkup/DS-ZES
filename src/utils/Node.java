@@ -190,21 +190,24 @@ public class Node implements Serializable {
 		double old_dist = Double.MAX_VALUE;
 		Boolean unsafe = false;
 		for (String key : neighborNodes.keySet()) {
-			
 			Node neighbor = neighborNodes.get(key);
-			if(unsafeNodes != null && !unsafeNodes.isEmpty()){ //will be null for REQ_UPDATED_PATROL. 
-				for(Node eachUnsafeNode:unsafeNodes){
-					/* closest neighbor shouldn't be there in the list of unsafe nodes*/
-					if (neighbor.ip.equalsIgnoreCase(eachUnsafeNode.ip)) {
-						unsafe = true;
-						break;
-					}
-				}
-			}
-			if(unsafe){
-				unsafe = false;
+			if (neighbor.getState() == SensorState.DANGER){
 				continue;
 			}
+//			if(unsafeNodes != null && !unsafeNodes.isEmpty()){ //will be null for REQ_UPDATED_PATROL. 
+//				for(Node eachUnsafeNode:unsafeNodes){
+//					/* closest neighbor shouldn't be there in the list of unsafe nodes*/
+//					if (neighbor.ip.equalsIgnoreCase(eachUnsafeNode.ip)) {
+//						unsafe = true;
+//						break;
+//					}
+//				}
+//			}
+//			if(unsafe){
+//				unsafe = false;
+//				continue;
+//			}
+			
 			double dist = neighbor.myLocation.findDistance(latLong);
 			System.out.println("Dist to "+neighbor.getName()+" is: "+dist);
 			if (dist <= old_dist) {
