@@ -435,6 +435,7 @@ public class P2PNetwork {
 				message.setKind(messageKind.NO_NEIGHBORS);
 				message.setDestIP(message.senderNode.ip);
 				message.setDestPort(message.senderNode.port);
+				message.unsafeNodes.add(this.localNode);
 				break;
 			case SAFE:
 				/* get destination of user */
@@ -464,7 +465,7 @@ public class P2PNetwork {
 					message.setJsonRoute(newJSON);
 					System.out.println("Route is " + message.jsonRoute.toString());
 				} else {
-					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes, message.senderNode);
+					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes, message.unsafeNodes);
 					if (closestNeighbor != null) {
 						System.out.println("Closest neighbor is: " + closestNeighbor.getName());
 						message.setDestIP(closestNeighbor.ip);
@@ -485,6 +486,7 @@ public class P2PNetwork {
 						message.setKind(messageKind.NO_NEIGHBORS);
 						message.setDestIP(message.senderNode.ip);
 						message.setDestPort(message.senderNode.port);
+						message.unsafeNodes.add(this.localNode);
 					}
 				}
 				break;
@@ -571,7 +573,7 @@ public class P2PNetwork {
 		latLong2[0] = Double.parseDouble(latLng2[0]);
 		latLong2[1] = Double.parseDouble(latLng2[1]);
 //		NodeLocation destLoc2 = new NodeLocation(latLong2);
-		Node closestNeighbor = localNode.findClosestNode(latLong2, neighborNodes,message.senderNode);
+		Node closestNeighbor = localNode.findClosestNode(latLong2, neighborNodes,message.unsafeNodes);
 		if(closestNeighbor!=null){
 			System.out.println(" Next Closest neighbor is: "+closestNeighbor.getName());
 			message.setKind(messageKind.MSG_JSON);

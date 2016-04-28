@@ -19,7 +19,7 @@ public class Message implements Serializable {
 	public int phonePort;
 	int seqNum;
 	Node closestNode = null; //ip of my neighbour which is closest to the sender
-
+	public ArrayList<Node> unsafeNodes= new ArrayList<Node>();
 
 	private HashMap<String, Node> neighborNodes;
 	private Node SplitNode;
