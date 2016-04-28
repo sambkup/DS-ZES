@@ -3,7 +3,7 @@
 
 
 
-FILENAME="DeployedNodeV0_11.jar"
+FILENAME="DeployedNodeV0_12.jar"
 
 # set the nodes to have reserved IPs
 case $HOSTNAME in
