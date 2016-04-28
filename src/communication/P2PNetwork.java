@@ -416,71 +416,150 @@ public class P2PNetwork {
 				}
 			}
 			return;
-	case MSG_JSON:
-		System.out.println("Received \"MSG_JSON\"");
+			
+		case MSG_JSON:
+			System.out.println("Received \"MSG_JSON\"");
 
+			/********************** new logic ********************/
+			// check if destloc is in my area. if yes, enter my location and
+			// send to phone
+			// else enter my location and send to closest neighbour from
+			// destlocation
+			// TODO: if my neighbours are unsafe, send back to the sender and
+			// ask to send to a different neighbour
 
-		/**********************new logic********************/
-		//check if destloc is in my area. if yes, enter my location and send to phone
-		//else enter my location and send to closest neighbour from destlocation
-		//TODO: if my neighbours are unsafe, send back to the sender and ask to send to a different neighbour
-
-
-	
-
-		/*get destination of user*/
-		String destloc = message.getDestLoc();
-		String latLng[] = destloc.split(",");
-		double latLong[] = new double[2];
-		latLong[0] = Double.parseDouble(latLng[0]);
-		latLong[1] = Double.parseDouble(latLng[1]);
-		NodeLocation destLoc = new NodeLocation(latLong);
-
-		/*if my area, send to phone else to closest neighbour*/
-		if(this.localNode.myPatrolArea.inMyArea(destLoc)){   
-			System.out.println("I am the last node in the chain");
-			message.setDestIP(message.phoneIP);  //setting as phone
-			message.setDestPort(message.phonePort);
-			/*enter my location to json */
-			//	JSONObject newJSON = message.getJsonRoute();
-			ArrayList<String> newJSON = new ArrayList<String>();
-			if (this.localNode.getState() == SensorState.SAFE) {
-				try {
-					newJSON = this.localNode.enterLocation(message.getJsonRoute());
-				} catch (Exception ex) {
-					System.out.println("error in entering my location to JSON");
-					ex.printStackTrace();
-				}
-			}
-			message.setJsonRoute(newJSON);
-			System.out.println("Route is "+message.jsonRoute.toString());
-		} else{
-			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes,message.senderNode);
-			if(closestNeighbor!=null){
-				System.out.println("Closest neighbor is: "+closestNeighbor.getName());
-				message.setDestIP(closestNeighbor.ip); 
-				message.setDestPort(closestNeighbor.port);	
-				/*enter my location to json */
-				//	JSONObject newJSON = message.getJsonRoute();
-				ArrayList<String> newJSON = new ArrayList<String>();
-				if (this.localNode.getState() == SensorState.SAFE) {
+			switch (this.localNode.getState()) {
+			case DANGER:
+				// I'm not safe, ask sender to send to a different neighbor.
+				// send no_neighbors itself?
+				message.setKind(messageKind.NO_NEIGHBORS);
+				message.setDestIP(message.senderNode.ip);
+				message.setDestPort(message.senderNode.port);
+				break;
+			case SAFE:
+				/* get destination of user */
+				String destloc = message.getDestLoc();
+				String latLng[] = destloc.split(",");
+				double latLong[] = new double[2];
+				latLong[0] = Double.parseDouble(latLng[0]);
+				latLong[1] = Double.parseDouble(latLng[1]);
+				NodeLocation destLoc = new NodeLocation(latLong);
+				/*
+				 * if destination is in my area, send to phone else to closest
+				 * neighbour
+				 */
+				if (this.localNode.myPatrolArea.inMyArea(destLoc)) {
+					System.out.println("I am the last node in the chain");
+					message.setDestIP(message.phoneIP); // setting as phone
+					message.setDestPort(message.phonePort);
+					/* enter my location to json */
+					// JSONObject newJSON = message.getJsonRoute();
+					ArrayList<String> newJSON = new ArrayList<String>();
 					try {
 						newJSON = this.localNode.enterLocation(message.getJsonRoute());
 					} catch (Exception ex) {
 						System.out.println("error in entering my location to JSON");
 						ex.printStackTrace();
 					}
+					message.setJsonRoute(newJSON);
+					System.out.println("Route is " + message.jsonRoute.toString());
+				} else {
+					Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes, message.senderNode);
+					if (closestNeighbor != null) {
+						System.out.println("Closest neighbor is: " + closestNeighbor.getName());
+						message.setDestIP(closestNeighbor.ip);
+						message.setDestPort(closestNeighbor.port);
+						/* enter my location to json */
+						// JSONObject newJSON = message.getJsonRoute();
+						ArrayList<String> newJSON = new ArrayList<String>();
+
+						try {
+							newJSON = this.localNode.enterLocation(message.getJsonRoute());
+						} catch (Exception ex) {
+							System.out.println("error in entering my location to JSON");
+							ex.printStackTrace();
+						}
+						message.setJsonRoute(newJSON);
+					} else { // i dont have any safe neighbors other than the
+								// sender, send it to sender
+						message.setKind(messageKind.NO_NEIGHBORS);
+						message.setDestIP(message.senderNode.ip);
+						message.setDestPort(message.senderNode.port);
+					}
 				}
-				message.setJsonRoute(newJSON);
-			} else{ //i dont have any safe neighbors other than the sender, send it to sender
-				message.setKind(messageKind.NO_NEIGHBORS);
-				message.setDestIP(message.senderNode.ip);
-				message.setDestPort(message.senderNode.port);
+				break;
 			}
-		}
+			
+		
 		message.setSenderNode(localNode);
-		this.send(message);	
+		this.send(message);
 		return;
+			
+//	case MSG_JSON:
+//		System.out.println("Received \"MSG_JSON\"");
+//
+//
+//		/**********************new logic********************/
+//		//check if destloc is in my area. if yes, enter my location and send to phone
+//		//else enter my location and send to closest neighbour from destlocation
+//		//TODO: if my neighbours are unsafe, send back to the sender and ask to send to a different neighbour
+//
+//
+//	
+//
+//		/*get destination of user*/
+//		String destloc = message.getDestLoc();
+//		String latLng[] = destloc.split(",");
+//		double latLong[] = new double[2];
+//		latLong[0] = Double.parseDouble(latLng[0]);
+//		latLong[1] = Double.parseDouble(latLng[1]);
+//		NodeLocation destLoc = new NodeLocation(latLong);
+//
+//		/*if my area, send to phone else to closest neighbour*/
+//		if(this.localNode.myPatrolArea.inMyArea(destLoc)){   
+//			System.out.println("I am the last node in the chain");
+//			message.setDestIP(message.phoneIP);  //setting as phone
+//			message.setDestPort(message.phonePort);
+//			/*enter my location to json */
+//			//	JSONObject newJSON = message.getJsonRoute();
+//			ArrayList<String> newJSON = new ArrayList<String>();
+//			if (this.localNode.getState() == SensorState.SAFE) {
+//				try {
+//					newJSON = this.localNode.enterLocation(message.getJsonRoute());
+//				} catch (Exception ex) {
+//					System.out.println("error in entering my location to JSON");
+//					ex.printStackTrace();
+//				}
+//			}
+//			message.setJsonRoute(newJSON);
+//			System.out.println("Route is "+message.jsonRoute.toString());
+//		} else{
+//			Node closestNeighbor = localNode.findClosestNode(latLong, neighborNodes,message.senderNode);
+//			if(closestNeighbor!=null){
+//				System.out.println("Closest neighbor is: "+closestNeighbor.getName());
+//				message.setDestIP(closestNeighbor.ip); 
+//				message.setDestPort(closestNeighbor.port);	
+//				/*enter my location to json */
+//				//	JSONObject newJSON = message.getJsonRoute();
+//				ArrayList<String> newJSON = new ArrayList<String>();
+//				if (this.localNode.getState() == SensorState.SAFE) {
+//					try {
+//						newJSON = this.localNode.enterLocation(message.getJsonRoute());
+//					} catch (Exception ex) {
+//						System.out.println("error in entering my location to JSON");
+//						ex.printStackTrace();
+//					}
+//				}
+//				message.setJsonRoute(newJSON);
+//			} else{ //i dont have any safe neighbors other than the sender, send it to sender
+//				message.setKind(messageKind.NO_NEIGHBORS);
+//				message.setDestIP(message.senderNode.ip);
+//				message.setDestPort(message.senderNode.port);
+//			}
+//		}
+//		message.setSenderNode(localNode);
+//		this.send(message);	
+//		return;
 		
 		/* send to a different neighbor, my location already in route - so need not enter;*/
 		
