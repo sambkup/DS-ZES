@@ -188,7 +188,7 @@ public class Node implements Serializable {
 	public Node findClosestNode(double[] latLong, HashMap<String, Node> neighborNodes,ArrayList<Node> unsafeNodes) {
 		Node returnNode = null;
 		double old_dist = Double.MAX_VALUE;
-		Boolean unsafe = false;
+//		Boolean unsafe = false;
 		for (String key : neighborNodes.keySet()) {
 			Node neighbor = neighborNodes.get(key);
 			if (neighbor.getState() == SensorState.DANGER){
