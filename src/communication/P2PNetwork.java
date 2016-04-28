@@ -693,7 +693,6 @@ class Connection extends Thread {
 				if (message.kind != messageKind.HEARTBEAT){
 					System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
 				}
-				System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
 				p2p.receive_message(message, this);
 			}
 
