@@ -690,7 +690,7 @@ class Connection extends Thread {
 				String json = in.readUTF();
 				Message message = gson.fromJson(json, Message.class);				
 				
-				if (message.getKind() != messageKind.HEARTBEAT){
+				if (message.kind != messageKind.HEARTBEAT){
 					System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
 				}
 				System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
