@@ -690,7 +690,7 @@ class Connection extends Thread {
 				
 				String ip = "";
 				int port = 0;
-				if (message.senderNode.ip != null){
+				if (message.senderNode.ip != null && !message.senderNode.ip.isEmpty()){
 					ip = message.senderNode.ip;
 				}
 				if (message.senderNode.port != 0){
