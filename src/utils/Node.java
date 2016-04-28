@@ -185,16 +185,25 @@ public class Node implements Serializable {
 	 *            	senderNode - shouldnot compare with this
 	 * @return Given a node, determine the closest node from my neighbors and return the node
 	 */
-	public Node findClosestNode(double[] latLong, HashMap<String, Node> neighborNodes,Node senderNode) {
+	public Node findClosestNode(double[] latLong, HashMap<String, Node> neighborNodes,ArrayList<Node> unsafeNodes) {
 		Node returnNode = null;
 		double old_dist = Double.MAX_VALUE;
+		Boolean unsafe = false;
 		for (String key : neighborNodes.keySet()) {
 			
 			Node neighbor = neighborNodes.get(key);
-			if(senderNode!=null){ //will be null for REQ_UPDATED_PATROL. 
-				if(neighbor.ip.equalsIgnoreCase(senderNode.ip)){
-					continue;
+			if(!unsafeNodes.isEmpty()){ //will be null for REQ_UPDATED_PATROL. 
+				for(Node eachUnsafeNode:unsafeNodes){
+					/* closest neighbor shouldn't be there in the list of unsafe nodes*/
+					if (neighbor.ip.equalsIgnoreCase(eachUnsafeNode.ip)) {
+						unsafe = true;
+						break;
+					}
 				}
+			}
+			if(unsafe){
+				unsafe = false;
+				continue;
 			}
 			double dist = neighbor.myLocation.findDistance(latLong);
 			System.out.println("Dist to "+neighbor.getName()+" is: "+dist);
