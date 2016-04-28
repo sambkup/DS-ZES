@@ -167,8 +167,10 @@ public class P2PNetwork {
 	public void send(Message message) {
 		String ip = message.destIP;
 		int port = message.destPort;
-		
-		System.out.println("Sending message "+message.getKind()+" to "+ip+":"+port);
+		if (message.getKind() != messageKind.HEARTBEAT){
+			System.out.println("Sending message "+message.getKind()+" to "+ip+":"+port);
+		}
+
 
 		Socket s = null;
 		Connection connection_to_use = null;
@@ -688,6 +690,9 @@ class Connection extends Thread {
 				String json = in.readUTF();
 				Message message = gson.fromJson(json, Message.class);				
 				
+				if (message.getKind() != messageKind.HEARTBEAT){
+					System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
+				}
 				System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
 				p2p.receive_message(message, this);
 			}
