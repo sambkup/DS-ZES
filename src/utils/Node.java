@@ -194,7 +194,7 @@ public class Node implements Serializable {
 			if (neighbor.getState() == SensorState.DANGER){
 				continue;
 			}
-			if(neighbor.ip.equalsIgnoreCase(senderNode.ip)){
+			if(senderNode != null && neighbor.ip.equalsIgnoreCase(senderNode.ip)){
 				continue;
 			}
 //			if(unsafeNodes != null && !unsafeNodes.isEmpty()){ //will be null for REQ_UPDATED_PATROL. 
