@@ -686,19 +686,9 @@ class Connection extends Thread {
 			while (true) {
 								
 				String json = in.readUTF();
-				Message message = gson.fromJson(json, Message.class);
+				Message message = gson.fromJson(json, Message.class);				
 				
-				String ip = "";
-				int port = 0;
-				if (message.senderNode.ip != null && !message.senderNode.ip.isEmpty()){
-					ip = message.senderNode.ip;
-				}
-				if (message.senderNode.port != 0){
-					port = message.senderNode.port;
-				}
-				
-				
-				System.out.println("Received message "+message.getKind()+" from "+ip+":"+port);
+				System.out.println("Received message "+message.getKind()+" from "+this.clientSocket.getInetAddress()+":"+this.clientSocket.getPort());
 				p2p.receive_message(message, this);
 			}
 
