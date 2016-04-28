@@ -511,7 +511,7 @@ public class P2PNetwork {
 
 	private void listen_server() {
 		System.out.println("Starting MessagePasser server with address = " + this.localNode.getName());
-		int counter = 0;
+//		int counter = 0;
 		ServerSocket listenSocket = null;
 		try {
 			listenSocket = new ServerSocket(this.localNode.port);
@@ -519,8 +519,8 @@ public class P2PNetwork {
 			while (true) {
 				Socket clientSocket = listenSocket.accept();				
 				new Connection(clientSocket, this);
-				System.out.println("Server received a new connection: # " + counter + " ip: "+clientSocket.getRemoteSocketAddress());
-				counter++;
+//				System.out.println("Server received a new connection: # " + counter + " ip: "+clientSocket.getRemoteSocketAddress());
+//				counter++;
 			}
 		} catch (IOException e) {
 			System.out.println("Listen socket:" + e.getMessage());
@@ -569,7 +569,7 @@ public class P2PNetwork {
 			Socket client = new Socket(address, port);
 			ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
 			oos.writeObject(this.localNode);
-			System.out.println("Overlay updated");
+//			System.out.println("Overlay updated");
 
 			client.close();
 		}catch(IOException e)
@@ -674,6 +674,18 @@ class Connection extends Thread {
 								
 				String json = in.readUTF();
 				Message message = gson.fromJson(json, Message.class);
+				
+				String ip = "";
+				int port = 0;
+				if (message.senderNode.ip != null){
+					ip = message.senderNode.ip;
+				}
+				if (message.senderNode.port != 0){
+					port = message.senderNode.port;
+				}
+				
+				
+				System.out.println("Received message "+message.getKind()+" from "+ip+":"+port);
 				p2p.receive_message(message, this);
 			}
 
@@ -681,7 +693,7 @@ class Connection extends Thread {
 //			System.out.println("Server EOF:" + e.getMessage());
 			
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+//			System.out.println(e.getMessage());
 
 			
 		} finally {
@@ -698,6 +710,7 @@ class Connection extends Thread {
 
 	public void write_object(Object object) {
 
+		
 		Gson gson = new Gson();
 
 		String json = gson.toJson(object);
