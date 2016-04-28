@@ -638,7 +638,7 @@ public class P2PNetwork {
 			public void run() {
 				while (true) {
 					try {
-						Thread.sleep(5000);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
